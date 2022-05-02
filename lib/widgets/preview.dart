@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:wazplay/support/interfaces/previewable.dart';
 import 'package:wazplay/widgets/custom_image.dart';
+import 'package:wazplay/widgets/placeholder.dart';
 
 class Preview extends StatelessWidget {
-  final PreviewAble previewAble;
+  final PreviewAble? previewAble;
   final double width;
   final double height;
   final bool centerText;
@@ -13,7 +14,7 @@ class Preview extends StatelessWidget {
   final Axis axis;
   const Preview(
       {Key? key,
-      required this.previewAble,
+      this.previewAble,
       required this.width,
       required this.height,
       this.axis = Axis.vertical,
@@ -35,13 +36,28 @@ class Preview extends StatelessWidget {
                   ? CrossAxisAlignment.center
                   : CrossAxisAlignment.start,
               children: [
-                  buildPlaceholder(context, height: height * 0.5, width: width),
+                  previewAble == null
+                      ? CustomPlaceholder(width: width, height: height * 0.5)
+                      : buildPlaceholder(context,
+                          height: height * 0.5, width: width),
                   const SizedBox(height: 10),
-                  if (showTitle) buildTitle(context),
-                  if (showSubtitle) buildSubtitle(context)
+                  if (showTitle)
+                    previewAble == null
+                        ? CustomPlaceholder(width: width * 0.5, height: 16)
+                        : buildTitle(context),
+                  if (showSubtitle)
+                    previewAble == null
+                        ? CustomPlaceholder(width: width * 0.7, height: 16)
+                        : buildSubtitle(context)
                 ])
           : Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-              buildPlaceholder(context, height: height, width: width * 0.25),
+              previewAble == null
+                  ? CustomPlaceholder(
+                      height: height,
+                      width: width * 0.25,
+                    )
+                  : buildPlaceholder(context,
+                      height: height, width: width * 0.25),
               const SizedBox(
                 width: 12,
               ),
@@ -52,8 +68,14 @@ class Preview extends StatelessWidget {
                       ? CrossAxisAlignment.center
                       : CrossAxisAlignment.start,
                   children: [
-                    if (showTitle) buildTitle(context),
-                    if (showSubtitle) buildSubtitle(context)
+                    if (showTitle)
+                      previewAble == null
+                          ? CustomPlaceholder(width: width * 0.5, height: 16)
+                          : buildTitle(context),
+                    if (showSubtitle)
+                      previewAble == null
+                          ? CustomPlaceholder(width: width * 0.7, height: 16)
+                          : buildSubtitle(context)
                   ],
                 ),
               ),
@@ -65,7 +87,7 @@ class Preview extends StatelessWidget {
   Widget buildTitle(BuildContext context) {
     return Flexible(
       child: Text(
-        previewAble.getTitle(),
+        previewAble!.getTitle(),
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
         style: Theme.of(context)
@@ -78,7 +100,7 @@ class Preview extends StatelessWidget {
 
   Text buildSubtitle(BuildContext context) {
     return Text(
-      previewAble.getSubtitle(),
+      previewAble!.getSubtitle(),
       overflow: TextOverflow.ellipsis,
       style: Theme.of(context).textTheme.caption,
     );
@@ -86,11 +108,11 @@ class Preview extends StatelessWidget {
 
   Widget buildPlaceholder(BuildContext context,
       {required double width, required double height}) {
-    return previewAble.getImagePlaceholder() != null
+    return previewAble!.getImagePlaceholder() != null
         ? ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: CustomImage(
-              url: previewAble.getImagePlaceholder()!,
+              url: previewAble!.getImagePlaceholder()!,
               height: height,
               width: width,
               boxFit: BoxFit.fill,

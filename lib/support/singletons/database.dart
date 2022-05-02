@@ -7,7 +7,7 @@ import 'package:wazplay/support/eloquents/song.dart';
 import 'package:wazplay/support/models/song.dart';
 
 class DB {
-  static const idType = 'INTEGER PRIMARY KEY';
+  static const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
   static const boolType = 'BOOLEAN NOT NULL';
   static const integerType = 'INTEGER NOT NULL';
   static const stringType = 'TEXT NOT NULL';

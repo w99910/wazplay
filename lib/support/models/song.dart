@@ -25,7 +25,6 @@ class Song implements PreviewAble, Playable {
 
   Map<String, Object?> toJson() {
     return {
-      SongFields.id: id,
       SongFields.title: title,
       SongFields.author: author,
       SongFields.path: path,
@@ -64,7 +63,6 @@ class Song implements PreviewAble, Playable {
         currentDuration: Duration(
             milliseconds: int.parse(data[SongFields.currentDuration])));
   }
-
   static List<Song> dummyData = [
     Song(
         id: 0,
@@ -120,11 +118,15 @@ class Song implements PreviewAble, Playable {
   @override
   AudioSource getAudioSource() {
     var reg = RegExp(r'^(https|http):\/\/', caseSensitive: false);
+    // var path =
+    //     'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3';
     bool isOnline = reg.hasMatch(path);
     Uri _uri = isOnline ? Uri.parse(path) : Uri.file(path);
     MediaItem mediaItem = MediaItem(
-        id: id.toString(),
+        duration: const Duration(seconds: 180),
+        id: getId(),
         title: title,
+        artUri: thumbnail != null ? Uri.parse(thumbnail!) : null,
         extras: {
           "description": description,
           'url': path,
@@ -132,12 +134,12 @@ class Song implements PreviewAble, Playable {
           'createdAt': createdAt?.toIso8601String(),
           'updatedAt': updatedAt?.toIso8601String(),
           'lastListenedTime': updatedAt?.toIso8601String(),
-          'currentDuration': getInitialDuration()
+          'currentDuration': getInitialDuration().inMilliseconds
         },
-        album: 'URights - Podcast');
+        album: author);
     return isOnline
         ? LockCachingAudioSource(_uri, tag: mediaItem)
-        : AudioSource.uri(_uri);
+        : AudioSource.uri(_uri, tag: mediaItem);
   }
 
   @override
@@ -153,6 +155,11 @@ class Song implements PreviewAble, Playable {
   @override
   String getAuthor() {
     return author;
+  }
+
+  @override
+  String getId() {
+    return id.toString();
   }
 }
 

@@ -6,5 +6,6 @@ class ControllersBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut(() => MusicController());
+    Get.lazyPut(() => SongController());
   }
 }

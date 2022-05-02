@@ -17,8 +17,11 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<Song> songs = [];
+  List<Song> recentlyAdded = [];
+  List<Song> recentlyPlayed = [];
   late SongController songController;
   late MusicController musicController;
+  bool loading = true;
   @override
   void initState() {
     songController = SongController();
@@ -29,16 +32,19 @@ class _HomeState extends State<Home> {
 
   init() async {
     songs.addAll(await songController.all());
+    recentlyAdded.addAll(songs);
+    recentlyPlayed.addAll(songs);
     setState(() {
-      songs = songs;
+      recentlyAdded.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
+      recentlyPlayed.sort((a, b) => b.updatedAt!.compareTo(a.updatedAt!));
+      loading = false;
     });
-    inspect(songs);
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return songs.isEmpty
+    return loading
         ? const Center(child: CircularProgressIndicator.adaptive())
         : Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -61,26 +67,44 @@ class _HomeState extends State<Home> {
                           .headline4!
                           .copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 20),
-                  SizedBox(
-                    width: size.width,
-                    height: size.height * 0.22,
-                    child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (BuildContext buildcontext, int index) {
-                          Song song = Song.dummyData[index];
-                          return GestureDetector(
-                            onTap: () => {},
-                            child: Preview(
-                                previewAble: song,
-                                width: size.width * 0.45,
-                                height: size.height * 0.3),
-                          );
-                        },
-                        separatorBuilder: (_, __) => const SizedBox(
-                              width: 20,
-                            ),
-                        itemCount: Song.dummyData.length),
-                  ),
+                  recentlyPlayed.isNotEmpty
+                      ? SizedBox(
+                          width: size.width,
+                          height: size.height * 0.22,
+                          child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder:
+                                  (BuildContext buildcontext, int index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    List<Song> currentSongs = [];
+                                    currentSongs.addAll(recentlyPlayed);
+                                    currentSongs.insert(
+                                        0, currentSongs.removeAt(index));
+                                    musicController.songs.value = currentSongs;
+                                    if (musicController.isPlaying.value == -1) {
+                                      musicController.isPlaying.value = 1;
+                                    }
+                                  },
+                                  child: Preview(
+                                      previewAble: recentlyPlayed[index],
+                                      width: size.width * 0.45,
+                                      height: size.height * 0.3),
+                                );
+                              },
+                              separatorBuilder: (_, __) => const SizedBox(
+                                    width: 20,
+                                  ),
+                              itemCount: recentlyPlayed.length),
+                        )
+                      : InfoBox(
+                          width: size.width * 0.45,
+                          height: size.height * 0.22,
+                          messageTextStyle: const TextStyle(
+                            color: Colors.white,
+                          ),
+                          bgColor: Colors.black,
+                          message: 'Add New Song'),
                   const SizedBox(height: 8),
                   const Divider(),
                   const SizedBox(height: 8),
@@ -90,28 +114,44 @@ class _HomeState extends State<Home> {
                           .headline4!
                           .copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 20),
-                  SizedBox(
-                    width: size.width,
-                    height: size.height * 0.22,
-                    child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (BuildContext buildcontext, int index) {
-                          return GestureDetector(
-                            onTap: () {
-                              musicController.songs.value = songs;
-                              musicController.isPlaying.value = 1;
-                            },
-                            child: Preview(
-                                previewAble: songs[index],
-                                width: size.width * 0.45,
-                                height: size.height * 0.3),
-                          );
-                        },
-                        separatorBuilder: (_, __) => const SizedBox(
-                              width: 20,
-                            ),
-                        itemCount: songs.length),
-                  ),
+                  recentlyAdded.isNotEmpty
+                      ? SizedBox(
+                          width: size.width,
+                          height: size.height * 0.22,
+                          child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder:
+                                  (BuildContext buildcontext, int index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    List<Song> currentSongs = [];
+                                    currentSongs.addAll(recentlyAdded);
+                                    currentSongs.insert(
+                                        0, currentSongs.removeAt(index));
+                                    musicController.songs.value = currentSongs;
+                                    if (musicController.isPlaying.value == -1) {
+                                      musicController.isPlaying.value = 1;
+                                    }
+                                  },
+                                  child: Preview(
+                                      previewAble: recentlyAdded[index],
+                                      width: size.width * 0.45,
+                                      height: size.height * 0.3),
+                                );
+                              },
+                              separatorBuilder: (_, __) => const SizedBox(
+                                    width: 20,
+                                  ),
+                              itemCount: recentlyAdded.length),
+                        )
+                      : InfoBox(
+                          width: size.width * 0.45,
+                          height: size.height * 0.22,
+                          messageTextStyle: const TextStyle(
+                            color: Colors.white,
+                          ),
+                          bgColor: Colors.black,
+                          message: 'Add New Song'),
                   const SizedBox(height: 8),
                   const Divider(),
                   const SizedBox(height: 8),
@@ -140,7 +180,7 @@ class _HomeState extends State<Home> {
                         separatorBuilder: (_, __) => const SizedBox(
                               width: 20,
                             ),
-                        itemCount: 4),
+                        itemCount: 1),
                   )
                 ],
               ),

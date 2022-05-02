@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/instance_manager.dart';
+import 'package:wazplay/controllers/music_controller.dart';
+import 'package:wazplay/controllers/song_controller.dart';
 import 'package:wazplay/support/models/song.dart';
 import 'package:wazplay/widgets/preview.dart';
 
@@ -11,11 +14,29 @@ class Library extends StatefulWidget {
 
 class _LibraryState extends State<Library> {
   late TextEditingController _textEditingController;
+  late SongController songController;
+  late MusicController musicController;
+  List<Song> songs = [];
 
   @override
   void initState() {
     _textEditingController = TextEditingController();
+    songController = Get.find<SongController>();
+    musicController = Get.find<MusicController>();
     super.initState();
+    init();
+  }
+
+  init() async {
+    songs.addAll(await songController.all());
+    // recentlyAdded.addAll(songs);
+    // recentlyPlayed.addAll(songs);
+    setState(() {
+      songs = songs;
+      // recentlyAdded.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
+      // recentlyPlayed.sort((a, b) => b.updatedAt!.compareTo(a.updatedAt!));
+      // loading = false;
+    });
   }
 
   @override
@@ -74,11 +95,22 @@ class _LibraryState extends State<Library> {
                 child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (BuildContext buildcontext, int index) {
-                      return Preview(
-                          previewAble: Song.dummyData[index],
-                          width: size.width * 0.45,
-                          showSubtitle: false,
-                          height: size.height * 0.3);
+                      return GestureDetector(
+                        onTap: () {
+                          List<Song> currentSongs = [];
+                          currentSongs.addAll(songs);
+                          currentSongs.insert(0, currentSongs.removeAt(index));
+                          musicController.songs.value = currentSongs;
+                          if (musicController.isPlaying.value == -1) {
+                            musicController.isPlaying.value = 1;
+                          }
+                        },
+                        child: Preview(
+                            previewAble: Song.dummyData[index],
+                            width: size.width * 0.45,
+                            showSubtitle: false,
+                            height: size.height * 0.3),
+                      );
                     },
                     separatorBuilder: (_, __) => const SizedBox(
                           width: 20,
@@ -95,21 +127,35 @@ class _LibraryState extends State<Library> {
               const SizedBox(height: 20),
               SizedBox(
                 width: size.width,
-                height: size.height * 0.1 * Song.dummyData.length +
-                    (20 * (Song.dummyData.length - 1)),
+                height: songs.isNotEmpty
+                    ? size.height * 0.1 * songs.length +
+                        (20 * (songs.length - 1))
+                    : 40,
                 child: ListView.separated(
+                    physics: const NeverScrollableScrollPhysics(),
                     scrollDirection: Axis.vertical,
                     itemBuilder: (BuildContext buildcontext, int index) {
-                      return Preview(
-                          axis: Axis.horizontal,
-                          previewAble: Song.dummyData.reversed.toList()[index],
-                          width: size.width,
-                          height: size.height * 0.1);
+                      return GestureDetector(
+                        onTap: () {
+                          List<Song> currentSongs = [];
+                          currentSongs.addAll(songs);
+                          currentSongs.insert(0, currentSongs.removeAt(index));
+                          musicController.songs.value = currentSongs;
+                          if (musicController.isPlaying.value == -1) {
+                            musicController.isPlaying.value = 1;
+                          }
+                        },
+                        child: Preview(
+                            axis: Axis.horizontal,
+                            previewAble: songs[index],
+                            width: size.width,
+                            height: size.height * 0.1),
+                      );
                     },
                     separatorBuilder: (_, __) => const SizedBox(
                           height: 20,
                         ),
-                    itemCount: Song.dummyData.length),
+                    itemCount: songs.length),
               ),
             ],
           ),

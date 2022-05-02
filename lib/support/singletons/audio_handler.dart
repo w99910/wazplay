@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io' show Platform;
 
 import 'package:audio_session/audio_session.dart';
@@ -11,13 +12,15 @@ import 'package:just_audio_background/just_audio_background.dart'
 class CustomAudioHandler {
   static final CustomAudioHandler instance = CustomAudioHandler._init();
 
-  CustomAudioHandler._init();
+  CustomAudioHandler._init() {
+    _audioPlayer = AudioPlayer();
+  }
 
   double? defaultIconSize;
 
-  late AudioPlayer? _audioPlayer;
+  late AudioPlayer _audioPlayer;
 
-  late AudioSession? _audioSession;
+  AudioSession? _audioSession;
 
   ConcatenatingAudioSource? _audioSource;
 
@@ -25,12 +28,7 @@ class CustomAudioHandler {
   static Widget? _nextButton;
   static Widget? _previousButton;
 
-  AudioPlayer get audioPlayer => getAudioPlayer();
-
-  AudioPlayer getAudioPlayer() {
-    _audioPlayer ??= AudioPlayer();
-    return _audioPlayer!;
-  }
+  AudioPlayer get audioPlayer => _audioPlayer;
 
   Future setAudioSession(AudioSessionConfiguration configuration,
       {bool force = false}) async {
@@ -70,6 +68,7 @@ class CustomAudioHandler {
     for (var playable in playables) {
       _audioSources.add(playable.getAudioSource());
     }
+    inspect(_audioSources);
     return ConcatenatingAudioSource(children: _audioSources);
   }
 }

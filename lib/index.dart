@@ -13,7 +13,7 @@ import 'package:wazplay/support/eloquents/song.dart';
 import 'package:wazplay/support/singletons/app.dart';
 import 'package:wazplay/widgets/logo.dart';
 import 'package:wazplay/support/singletons/configuration.dart';
-import 'package:wazplay/widgets/music_player.dart';
+import 'package:wazplay/widgets/music_player_preview.dart';
 
 final List<Widget> pages = [
   const Home(),
@@ -74,9 +74,10 @@ class _IndexState extends State<Index> {
         children: pages,
       ),
       bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Obx(() => _musicController.isPlaying.value != -1
-              ? MusicPlayer.preview(
+              ? MusicPlayerPreview(
                   playables: _musicController.songs, isConcatenated: true)
               : const SizedBox()),
           BottomNavigationBar(

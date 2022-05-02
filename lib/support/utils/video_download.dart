@@ -22,7 +22,10 @@ class VideoDownload {
 
     // Get the video manifest.
     var manifest = await yt.videos.streamsClient.getManifest(id);
-    var audio = manifest.audioOnly.last;
+    // var audio = manifest.audioOnly.first;
+    // var audioStream = yt.videos.streamsClient.get(audio);
+    var streams = manifest.audio;
+    var audio = streams.withHighestBitrate();
     var audioStream = yt.videos.streamsClient.get(audio);
 
     var dir = await PathProvider.getPath();
@@ -49,6 +52,7 @@ class VideoDownload {
       throw Exception('Please check url is youtube link.');
     }
     var video = await yt.videos.get(url);
+    inspect(video);
     return {
       'title': video.title,
       'thumbnail': video.thumbnails.standardResUrl,

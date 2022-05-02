@@ -23,6 +23,11 @@ class AppTheme {
       appBarTheme: const AppBarTheme(
         systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
+      sliderTheme: SliderThemeData(
+        thumbColor: Colors.black,
+        activeTrackColor: Colors.black,
+        inactiveTrackColor: Colors.grey[200],
+      ),
       textTheme: const TextTheme(
           subtitle1: TextStyle(
               fontWeight: FontWeight.w400), // Default style for TextField

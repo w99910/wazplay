@@ -20,4 +20,9 @@ class SongController {
     }
     return songs;
   }
+
+  Future updateItem(
+      {required String id, required Map<String, Object?> update}) async {
+    return songEloquent.update(id, update);
+  }
 }
