@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wazplay/support/singletons/settings.dart' as AppSettings;
+import 'package:wazplay/support/singletons/app.dart';
+import 'package:wazplay/support/singletons/configuration.dart';
 
 class Settings extends StatefulWidget {
   const Settings({Key? key}) : super(key: key);
@@ -17,11 +18,11 @@ class _SettingsState extends State<Settings>
   bool isAutoDownloadThumbnail = true;
   late bool isVibratable;
 
-  AppSettings.Settings _appSettings = AppSettings.Settings.instance;
+  Configuration configuration = App.instance.configuration;
 
   @override
   void initState() {
-    isVibratable = _appSettings.vibrateable;
+    isVibratable = configuration.vibrateable;
     super.initState();
   }
 
@@ -116,7 +117,7 @@ class _SettingsState extends State<Settings>
                             setState(() {
                               isVibratable = val;
                             });
-                            _appSettings.vibrateable = val;
+                            configuration.vibrateable = val;
                           })
                     ],
                   ),
@@ -216,6 +217,5 @@ class _SettingsState extends State<Settings>
   }
 
   @override
-  // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
 }

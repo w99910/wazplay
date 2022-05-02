@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wazplay/support/models/song.dart';
-import 'package:wazplay/widgets/preview_song.dart';
+import 'package:wazplay/widgets/preview.dart';
 
 class Library extends StatefulWidget {
   const Library({Key? key}) : super(key: key);
@@ -74,7 +74,7 @@ class _LibraryState extends State<Library> {
                 child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (BuildContext buildcontext, int index) {
-                      return PreviewSong(
+                      return Preview(
                           previewAble: Song.dummyData[index],
                           width: size.width * 0.45,
                           showSubtitle: false,
@@ -100,7 +100,7 @@ class _LibraryState extends State<Library> {
                 child: ListView.separated(
                     scrollDirection: Axis.vertical,
                     itemBuilder: (BuildContext buildcontext, int index) {
-                      return PreviewSong(
+                      return Preview(
                           axis: Axis.horizontal,
                           previewAble: Song.dummyData.reversed.toList()[index],
                           width: size.width,

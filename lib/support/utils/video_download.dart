@@ -1,81 +1,101 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:wazplay/support/utils/path.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 // Initialize the YoutubeExplode instance.
 final yt = YoutubeExplode();
 
+class VideoDownload {
+  static Future<VideoDownloadStream> getVideoDownloadStream(String id) async {
+    if (!checkIfUrlIsYoutubeLink(id)) {
+      throw Exception('Please check url is youtube link.');
+    }
 
+    if (await Permission.storage.status == PermissionStatus.denied) {
+      await Permission.storage.request();
+    }
+    // Get video metadata.
+    var video = await yt.videos.get(id);
 
-Future<void> main() async {
-  stdout.writeln('Type the video id or url: ');
+    // Get the video manifest.
+    var manifest = await yt.videos.streamsClient.getManifest(id);
+    var audio = manifest.audioOnly.last;
+    var audioStream = yt.videos.streamsClient.get(audio);
 
-  var url = stdin.readLineSync()!.trim();
+    var dir = await PathProvider.getPath();
+    // Compose the file name removing the unallowed characters in windows.
+    var fileName = '${video.title}.${audio.container.name}'
+        .replaceAll(r'\', '')
+        .replaceAll('/', '')
+        .replaceAll('*', '')
+        .replaceAll('?', '')
+        .replaceAll('"', '')
+        .replaceAll('<', '')
+        .replaceAll('>', '')
+        .replaceAll('|', '');
+    var filePath = dir + '/' + fileName;
 
-  // Save the video to the download directory.
-  Directory('downloads').createSync();
-
-  // Download the video.
-  await download(url);
-
-  yt.close();
-  exit(0);
-}
-
-Future<void> download(String id) async {
-  // Get video metadata.
-  var video = await yt.videos.get(id);
-
-  // Get the video manifest.
-  var manifest = await yt.videos.streamsClient.getManifest(id);
-  var streams = manifest.videoOnly;
-
-  // Get the audio track with the highest bitrate.
-  var audio = streams.first;
-  var audioStream = yt.videos.streamsClient.get(audio);
-
-  // Compose the file name removing the unallowed characters in windows.
-  var fileName = '${video.title}.${audio.container.name}'
-      .replaceAll(r'\', '')
-      .replaceAll('/', '')
-      .replaceAll('*', '')
-      .replaceAll('?', '')
-      .replaceAll('"', '')
-      .replaceAll('<', '')
-      .replaceAll('>', '')
-      .replaceAll('|', '');
-  var file = File('downloads/$fileName');
-
-  // Delete the file if exists.
-  if (file.existsSync()) {
-    file.deleteSync();
+    return VideoDownloadStream(
+        path: filePath,
+        audioStream: audioStream,
+        totalSize: audio.size.totalBytes);
   }
 
-  // Open the file in writeAppend.
-  var output = file.openWrite(mode: FileMode.writeOnlyAppend);
+  static Future<Map<String, String>> getDetail(String url) async {
+    if (!checkIfUrlIsYoutubeLink(url)) {
+      throw Exception('Please check url is youtube link.');
+    }
+    var video = await yt.videos.get(url);
+    return {
+      'title': video.title,
+      'thumbnail': video.thumbnails.standardResUrl,
+      'author': video.author,
+      'path': url,
+      'description': video.description,
+    };
+  }
 
-  // Track the file download status.
-  var len = audio.size.totalBytes;
-  var count = 0;
+  static bool checkIfUrlIsYoutubeLink(String url) {
+    final reg = RegExp(r'^(https|http):\/\/youtu.be\/', caseSensitive: false);
+    return reg.hasMatch(url);
+  }
+}
 
-  // Create the message and set the cursor position.
-  var msg = 'Downloading ${video.title}.${audio.container.name}';
-  stdout.writeln(msg);
+class VideoDownloadStream {
+  String path;
+  Stream<List<int>> audioStream;
+  int totalSize;
+  StreamController<double> controller = StreamController<double>();
 
-  // Listen for data received.
-  // var progressBar = ProgressBar();
-  // await for (final data in audioStream) {
-  //   // Keep track of the current downloaded data.
-  //   count += data.length;
+  Stream<double> get stream => controller.stream;
 
-  //   // Calculate the current progress.
-  //   var progress = ((count / len) * 100).ceil();
+  VideoDownloadStream(
+      {required this.path, required this.audioStream, required this.totalSize});
 
-  //   // Update the progressbar.
-  //   progressBar.update(progress);
+  Future download() async {
+    var file = File(path);
 
-  //   // Write to file.
-  //   output.add(data);
-  // }
-  await output.close();
+    // // Delete the file if exists.
+    if (file.existsSync()) {
+      file.deleteSync();
+    }
+    var output = file.openWrite(mode: FileMode.writeOnlyAppend);
+    var size = totalSize;
+    var count = 0;
+
+    await for (final data in audioStream) {
+      // Keep track of the current downloaded data.
+      count += data.length;
+
+      // Calculate the current progress.
+      output.add(data);
+      var progress = ((count / size) * 100).ceil();
+      controller.sink.add(progress / 100);
+    }
+    controller.sink.close();
+    output.close();
+  }
 }

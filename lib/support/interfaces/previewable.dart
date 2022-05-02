@@ -3,5 +3,5 @@ abstract class PreviewAble {
   String getSubtitle();
   String? getDescription();
   String? getImagePlaceholder();
-  Function? onClick(PreviewAble item);
+  void onClick(PreviewAble item);
 }

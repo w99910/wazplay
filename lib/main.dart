@@ -1,11 +1,20 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:wazplay/configurations/app_theme.dart';
 import 'package:wazplay/index.dart';
+import 'package:wazplay/support/bindings/controllers_bindings.dart';
+import 'package:wazplay/support/eloquents/song.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
-void main() {
+Future<void> main() async {
+  await JustAudioBackground.init(
+    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+    androidNotificationChannelName: 'Audio playback',
+    androidNotificationOngoing: true,
+  );
   runApp(const MyApp());
 }
 
@@ -14,9 +23,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Flutter VideoDownload Demo',
       theme: AppTheme.lightTheme,
+      initialBinding: ControllersBinding(),
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.light,
       debugShowCheckedModeBanner: false,

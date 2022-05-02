@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:wazplay/support/interfaces/previewable.dart';
 import 'package:wazplay/widgets/custom_image.dart';
 
-class PreviewSong extends StatelessWidget {
+class Preview extends StatelessWidget {
   final PreviewAble previewAble;
   final double width;
   final double height;
   final bool centerText;
   final bool showTitle;
   final bool showSubtitle;
+  final Widget? actions;
   final Axis axis;
-  const PreviewSong(
+  const Preview(
       {Key? key,
       required this.previewAble,
       required this.width,
@@ -18,6 +19,7 @@ class PreviewSong extends StatelessWidget {
       this.axis = Axis.vertical,
       this.centerText = false,
       this.showSubtitle = true,
+      this.actions,
       this.showTitle = true})
       : super(key: key);
 
@@ -39,32 +41,38 @@ class PreviewSong extends StatelessWidget {
                   if (showSubtitle) buildSubtitle(context)
                 ])
           : Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-              buildPlaceholder(context, height: height, width: width * 0.3),
+              buildPlaceholder(context, height: height, width: width * 0.25),
               const SizedBox(
                 width: 12,
               ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: centerText
-                    ? CrossAxisAlignment.center
-                    : CrossAxisAlignment.start,
-                children: [
-                  if (showTitle) buildTitle(context),
-                  if (showSubtitle) buildSubtitle(context)
-                ],
-              )
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: centerText
+                      ? CrossAxisAlignment.center
+                      : CrossAxisAlignment.start,
+                  children: [
+                    if (showTitle) buildTitle(context),
+                    if (showSubtitle) buildSubtitle(context)
+                  ],
+                ),
+              ),
+              if (actions != null) actions!,
             ]),
     );
   }
 
-  Text buildTitle(BuildContext context) {
-    return Text(
-      previewAble.getTitle(),
-      overflow: TextOverflow.ellipsis,
-      style: Theme.of(context)
-          .textTheme
-          .headline6!
-          .copyWith(fontWeight: FontWeight.w600),
+  Widget buildTitle(BuildContext context) {
+    return Flexible(
+      child: Text(
+        previewAble.getTitle(),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: Theme.of(context)
+            .textTheme
+            .headline6!
+            .copyWith(fontWeight: FontWeight.w600),
+      ),
     );
   }
 

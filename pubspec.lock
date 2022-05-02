@@ -283,7 +283,7 @@ packages:
     source: hosted
     version: "1.7.0"
   path:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path
       url: "https://pub.dartlang.org"
@@ -442,7 +442,7 @@ packages:
     source: hosted
     version: "1.8.1"
   sqflite:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: sqflite
       url: "https://pub.dartlang.org"
@@ -518,6 +518,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.1"
+  wazeloquent:
+    dependency: "direct main"
+    description:
+      path: "../packages/wazeloquent"
+      relative: true
+    source: path
+    version: "0.0.1"
   win32:
     dependency: transitive
     description:
