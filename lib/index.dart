@@ -37,15 +37,21 @@ class _IndexState extends State<Index> {
 
   @override
   void initState() {
-    _musicController = Get.find<MusicController>();
+    _musicController = App.instance.musicController;
     _pageController = PageController();
     super.initState();
+    App.instance.routeController.currentTabIndex.listen((index) {
+      setState(() {
+        _currentIndex = index;
+      });
+      _pageController.animateToPage(index,
+          duration: const Duration(milliseconds: 100), curve: Curves.easeOut);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
         titleSpacing: 0,
@@ -90,9 +96,7 @@ class _IndexState extends State<Index> {
                   setState(() {
                     _currentIndex = index;
                   });
-                  _pageController.animateToPage(index,
-                      duration: const Duration(milliseconds: 100),
-                      curve: Curves.easeOut);
+                  App.instance.routeController.currentTabIndex.value = index;
                 }
               },
               items: const [

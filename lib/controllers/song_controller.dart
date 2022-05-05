@@ -1,28 +1,113 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:wazplay/support/eloquents/song.dart';
+import 'package:wazplay/support/interfaces/playable.dart';
+import 'package:wazplay/support/models/artist.dart';
 import 'package:wazplay/support/models/song.dart';
 
 class SongController {
-  // static SongController instance = SongController._();
-
-  // late SongEloquent songEloquent;
-
-  // SongController._() {
-  //   songEloquent = SongEloquent();
-  // }
-
   final SongEloquent songEloquent = SongEloquent();
 
-  Future<List<Song>> all() async {
-    var data = await songEloquent.all();
+  Future<List<Song>> all(
+      {int? limit,
+      String? orderBy,
+      String? groupBy,
+      bool? distinct,
+      bool descending = false,
+      int? offset}) async {
+    var data = await songEloquent.all(
+        limit: limit,
+        orderBy: orderBy,
+        distinct: distinct,
+        descending: descending,
+        offset: offset);
+    return fromDB(data);
+  }
+
+  Future<List<Song>> fromDB(List<Map<String, Object?>> rows) async {
     List<Song> songs = [];
-    for (var song in data) {
+    for (var song in rows) {
       songs.add(Song.fromDB(song));
     }
     return songs;
   }
 
+  Future<List<Song>> search(
+      {String? keyword, int? offset, int limit = 10}) async {
+    if (keyword == null) return all(limit: limit, offset: offset);
+    var data = await songEloquent.searchByKeyWord(keyword,
+        searchableColumns: ['title', 'author', 'description']);
+    return fromDB(data);
+  }
+
   Future updateItem(
       {required String id, required Map<String, Object?> update}) async {
     return songEloquent.update(id, update);
+  }
+
+  Future<List<Artist>> getArtists({String? keyword}) async {
+    List<Artist> artists = [];
+    List<String> titles = [];
+    var response = keyword != null
+        ? await songEloquent
+            .searchByKeyWord(keyword, searchableColumns: ['title'])
+        : await songEloquent.select(columns: ['title']);
+
+    for (var res in response) {
+      titles.add(res['title'].toString());
+    }
+
+    for (var title in titles) {
+      List<String> split = title.toString().split('-');
+      String artist = split[0];
+      if (split[0].contains(',')) {
+        artist = split[0].split(',')[0];
+      }
+      if (split[0].contains('&')) {
+        artist = split[0].split('&')[0];
+      }
+      artist = artist.trim();
+      if (artists.where((val) => val.name == artist).isEmpty) {
+        String? thumbnail, bio;
+        try {
+          Map<String, dynamic>? details = await Artist.getDetails(artist);
+          if (details != null) {
+            thumbnail = details['strArtistThumb'];
+            bio = details['strBiographyEN'];
+          }
+        } catch (e) {}
+        artists.add(Artist(name: artist, thumbnail: thumbnail, bio: bio));
+      }
+    }
+    return artists;
+    // var distinctArtists = songEloquent.
+  }
+
+  Future<List<Song>> getSongsByArtist(Artist artist) async {
+    List<Song> songs = [];
+    var response = await songEloquent
+        .searchByKeyWord(artist.name, searchableColumns: ['title']);
+    for (var row in response) {
+      songs.add(Song.fromDB(row));
+    }
+    return songs;
+  }
+
+  Future deleteSong(Playable playable) async {
+    //delete audio
+    File audio = File(playable.getAudioPath());
+    if (await audio.exists()) {
+      await audio.delete();
+    }
+    // Delete thumbnail if exists
+    String? thumbnail = playable.getThumbnailPath();
+    if (thumbnail != null) {
+      File thumbnailPath = File(thumbnail);
+      if (await thumbnailPath.exists()) {
+        await thumbnailPath.delete();
+      }
+    }
+    return await songEloquent.deleteBy(playable.getId());
   }
 }

@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:audio_session/audio_session.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
@@ -18,8 +20,12 @@ import 'package:wazplay/widgets/custom_image.dart';
 class MusicPlayer extends StatefulWidget {
   final List<Playable> playables;
   final Playable currentTrack;
+  final bool shouldUpdateAudioSource;
   const MusicPlayer(
-      {Key? key, required this.playables, required this.currentTrack})
+      {Key? key,
+      required this.playables,
+      required this.currentTrack,
+      this.shouldUpdateAudioSource = false})
       : super(key: key);
 
   @override
@@ -42,6 +48,9 @@ class _MusicPlayerState extends State<MusicPlayer> {
     _audioPlayer = _audioHandler.audioPlayer;
     _currentTrack = widget.currentTrack;
     super.initState();
+    if (widget.shouldUpdateAudioSource) {
+      init();
+    }
     _audioPlayer.sequenceStateStream.listen((event) {
       if (event != null) {
         if (mounted) {
@@ -59,10 +68,30 @@ class _MusicPlayerState extends State<MusicPlayer> {
     });
   }
 
+  init() async {
+    await _audioHandler.setAudioSource(_playables);
+    //Set Audio Session
+    await _audioHandler
+        .setAudioSession(const AudioSessionConfiguration.music());
+    _audioPlayer.play();
+  }
+
   @override
   void setState(VoidCallback fn) {
     if (mounted) {
       super.setState(fn);
+    }
+  }
+
+  delete(Playable playable) async {
+    await _songController.deleteSong(playable);
+    bool? isSuccess = await _audioHandler.remove(_audioPlayer.currentIndex!);
+    _musicController.reload();
+    if (!isSuccess) {
+      _musicController.songs.value = [];
+      Future.delayed(const Duration(milliseconds: 300), () {
+        Navigator.pop(context);
+      });
     }
   }
 
@@ -84,134 +113,193 @@ class _MusicPlayerState extends State<MusicPlayer> {
         leading: IconButton(
             icon: const Icon(
               Icons.arrow_back_ios,
-              color: Colors.black,
             ),
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
             }),
         actions: [
-          IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.edit,
-                color: Colors.black,
-              ))
+          PopupMenuButton(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            itemBuilder: (BuildContext context) => <PopupMenuItem>[
+              PopupMenuItem(
+                  onTap: () async {
+                    Future.delayed(const Duration(milliseconds: 50), () async {
+                      bool confirm = false;
+                      await showDialog(
+                          context: context,
+                          builder: (builder) {
+                            return CupertinoAlertDialog(
+                              title: const Text(
+                                  'Are you sure to delete the song?'),
+                              actions: [
+                                TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      confirm = true;
+                                    },
+                                    child: const Text('Yes')),
+                                TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('No'))
+                              ],
+                            );
+                          });
+
+                      if (confirm) {
+                        delete(_currentTrack);
+                      }
+                    });
+                  },
+                  child: const ListTile(
+                    leading: Icon(Icons.delete),
+                    dense: true,
+                    title: Text('Delete'),
+                  ))
+            ],
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Icon(Icons.more_vert),
+            ),
+          )
+          // DropdownButton(items: [], onChanged: onChanged)
+          // IconButton(onPressed: () {
+          // }, icon: const Icon(Icons.more_vert))
         ],
       ),
-      body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        height: size.height,
-        width: size.width,
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Hero(
-                tag: '_placeholder',
-                createRectTween: (begin, end) =>
-                    CustomRectTween(begin: begin!, end: end!),
-                child: buildPlaceholder(context, height: size.height * 0.3),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: size.width * 0.8,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _currentTrack.getTitle(),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                      style: Theme.of(context).textTheme.headline6,
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      _currentTrack.getAuthor(),
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.caption,
-                    ),
-                    const SizedBox(height: 10),
-                    _currentTrack.getDescription() != null
-                        ? GestureDetector(
-                            onTap: () {
-                              showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          topRight: Radius.circular(10))),
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return SafeArea(
-                                      child: Container(
-                                        constraints: BoxConstraints(
-                                            maxHeight: size.height * 0.8),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 24, vertical: 30),
-                                          child: SingleChildScrollView(
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                SelectableText(_currentTrack
-                                                    .getDescription()!),
-                                              ],
+      body: Align(
+        alignment: Alignment.center,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          height: size.height,
+          width: size.width * 0.95,
+          child: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Hero(
+                  tag: '_placeholder',
+                  createRectTween: (begin, end) =>
+                      CustomRectTween(begin: begin!, end: end!),
+                  child: buildPlaceholder(context, height: size.height * 0.3),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: size.width * 0.8,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _currentTrack.getTitle(),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style: Theme.of(context).textTheme.headline6,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        _currentTrack.getAuthor(),
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.caption,
+                      ),
+                      const SizedBox(height: 10),
+                      _currentTrack.getDescription() != null
+                          ? GestureDetector(
+                              onTap: () {
+                                showModalBottomSheet(
+                                    isScrollControlled: true,
+                                    shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                            topRight: Radius.circular(10))),
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return SafeArea(
+                                        child: Container(
+                                          constraints: BoxConstraints(
+                                              maxHeight: size.height * 0.8),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 24, vertical: 30),
+                                            child: SingleChildScrollView(
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  SelectableText(_currentTrack
+                                                      .getDescription()!),
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  });
-                            },
-                            child: Text(_currentTrack.getDescription()!,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                    decoration: TextDecoration.underline)))
-                        : const SizedBox(height: 10),
+                                      );
+                                    });
+                              },
+                              child: Text(_currentTrack.getDescription()!,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                      decoration: TextDecoration.underline)))
+                          : const SizedBox(height: 10),
+                    ],
+                  ),
+                ),
+                StreamBuilder<PositionData>(
+                  stream: _positionDataStream,
+                  builder: (context, snapshot) {
+                    final positionData = snapshot.data;
+                    return SeekBar(
+                      duration: positionData?.duration ?? Duration.zero,
+                      position: positionData?.position ?? Duration.zero,
+                      bufferedPosition:
+                          positionData?.bufferedPosition ?? Duration.zero,
+                      onChangeEnd: (newPosition) {
+                        _audioPlayer.seek(newPosition);
+                      },
+                    );
+                  },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ControlButton.buildPreviousButton(
+                        audioPlayer: _audioPlayer),
+                    const SizedBox(width: 14),
+                    ControlButton.buildPlayButton(_audioPlayer),
+                    const SizedBox(width: 14),
+                    ControlButton.buildNextButton(audioPlayer: _audioPlayer),
                   ],
                 ),
-              ),
-              StreamBuilder<PositionData>(
-                stream: _positionDataStream,
-                builder: (context, snapshot) {
-                  final positionData = snapshot.data;
-                  return SeekBar(
-                    duration: positionData?.duration ?? Duration.zero,
-                    position: positionData?.position ?? Duration.zero,
-                    bufferedPosition:
-                        positionData?.bufferedPosition ?? Duration.zero,
-                    onChangeEnd: (newPosition) {
-                      _audioPlayer.seek(newPosition);
-                    },
-                  );
-                },
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ControlButton.buildPreviousButton(audioPlayer: _audioPlayer),
-                  const SizedBox(width: 14),
-                  ControlButton.buildPlayButton(_audioPlayer),
-                  const SizedBox(width: 14),
-                  ControlButton.buildNextButton(audioPlayer: _audioPlayer),
-                ],
-              ),
-              ControlButton.buildVolumeSlider(
-                  audioPlayer: _audioPlayer, context: context),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  buildLyricsButton(size),
-                  ControlButton.buildLoopButton(_audioPlayer,
-                      enableColor: Colors.black),
-                  ControlButton.buildShuffleButton(_audioPlayer,
-                      enableColor: Colors.black)
-                ],
-              )
-            ],
+                ControlButton.buildVolumeSlider(
+                    audioPlayer: _audioPlayer, context: context),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Tooltip(
+                        message: 'Show Lyrics', child: buildLyricsButton(size)),
+                    Tooltip(
+                      message: 'Switch Loop Mode',
+                      child: ControlButton.buildLoopButton(_audioPlayer,
+                          onClick: (LoopMode loopMode) async {
+                        (await SharedPreferences.getInstance())
+                            .setString('loopMode', loopMode.name);
+                      }, enableColor: Theme.of(context).iconTheme.color),
+                    ),
+                    Tooltip(
+                      message: 'Toggle Shuffle',
+                      child: ControlButton.buildShuffleButton(_audioPlayer,
+                          onClick: (isShuffle) async {
+                        (await SharedPreferences.getInstance())
+                            .setBool('isShuffle', isShuffle);
+                      }, enableColor: Theme.of(context).iconTheme.color),
+                    )
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -278,16 +366,18 @@ class _MusicPlayerState extends State<MusicPlayer> {
                                     if (!RegExp(r'\-').hasMatch(title)) {
                                       return 'Lyrics Not Found';
                                     }
-                                    var payload =
-                                        LyricApi.getArtistAndTrack(title);
-                                    inspect(payload);
-                                    var response = await LyricApi.getLyrics(
-                                        artist: payload[Lyric.artist]!,
-                                        track: payload[Lyric.track]!);
-
-                                    await prefs.setString(
-                                        _currentTrack.getTitle(), response);
-                                    return response;
+                                    try {
+                                      var payload =
+                                          LyricApi.getArtistAndTrack(title);
+                                      var response = await LyricApi.getLyrics(
+                                          artist: payload[Lyric.artist]!,
+                                          track: payload[Lyric.track]!);
+                                      await prefs.setString(
+                                          _currentTrack.getTitle(), response);
+                                      return response;
+                                    } catch (e) {
+                                      return 'Lyrics Not Found';
+                                    }
                                   }), builder:
                                         (context, AsyncSnapshot snapshot) {
                                     if (!snapshot.hasData) {

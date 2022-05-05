@@ -126,7 +126,7 @@ class Preview extends StatelessWidget {
             height: height,
             child: Icon(
               Icons.image,
-              size: width * 0.5,
+              size: width * 0.6,
               color: Theme.of(context).primaryColorDark,
             ),
           );

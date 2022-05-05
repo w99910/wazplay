@@ -4,6 +4,8 @@ import 'package:just_audio_background/just_audio_background.dart'
 import 'package:wazplay/support/eloquents/song.dart';
 import 'package:wazplay/support/interfaces/playable.dart';
 import 'package:wazplay/support/interfaces/previewable.dart';
+import 'package:wazplay/support/singletons/app.dart';
+import 'package:wazplay/support/utils/download.dart';
 
 class Song implements PreviewAble, Playable {
   int id;
@@ -63,21 +65,6 @@ class Song implements PreviewAble, Playable {
         currentDuration: Duration(
             milliseconds: int.parse(data[SongFields.currentDuration])));
   }
-  static List<Song> dummyData = [
-    Song(
-        id: 0,
-        title: 'Mantra',
-        author: 'Bring Me The Horizon',
-        path: 'Path',
-        thumbnail:
-            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTz-uN2qM2DH70_IdrOqnRDW3yR5vn_LlpGRnU8Oevso0rrtGTfI5rzxSwiLfB72HRy52w&usqp=CAU'),
-    Song(
-        id: 1,
-        title: 'Die4U',
-        author: 'Bring Me The Horizon',
-        path: 'Path',
-        thumbnail: 'https://i.ytimg.com/vi/IPUUbVhvqrE/maxresdefault.jpg')
-  ];
 
   @override
   String getDescription() {
@@ -104,10 +91,20 @@ class Song implements PreviewAble, Playable {
     // return () => {};
   }
 
-  save() async {
+  Future<void> save() async {
     var songEloquent = SongEloquent();
-    songEloquent
+    await songEloquent
         .createIfNotExists(check: {SongFields.title: title}, create: toJson());
+  }
+
+  Future<void> reload() async {
+    var song = Song.fromDB(
+        (await SongEloquent().where({'title': title, 'author': author})).first);
+    id = song.id;
+    thumbnail = thumbnail;
+    description = description;
+    createdAt = createdAt;
+    updatedAt = updatedAt;
   }
 
   @override

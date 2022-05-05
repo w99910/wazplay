@@ -24,9 +24,10 @@ class LyricApi {
     if (split[0].contains('&')) {
       artist = split[0].split('&')[0];
     }
-    String track = split[1].replaceAllMapped(RegExp(r'[\(].*'), (match) {
-      return '';
-    });
+    String track = split[1]
+        .replaceAllMapped(RegExp(r'[\(].*'), (match) => '')
+        .replaceAllMapped(RegExp(r'[\[]].*'), (match) => '')
+        .replaceAllMapped(RegExp(r'(ft).*'), (match) => '');
     return {
       Lyric.artist: artist.trim(),
       Lyric.track: track.trim(),

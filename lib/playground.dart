@@ -1,15 +1,32 @@
+// import 'dart:';
 void main() {
-  String s = 'ILLENIUM, Jon Bellion - Good Things Fall Apart (Lyric Video)';
-  List split = s.split('-');
-  String author = split[0];
-  String title = split[1];
-  // for (var i in RegExp(r'(\w+)[^\((\w+)\)]').allMatches(title)) {
-  //   print(i.group(0));
-  // }
-  final newString = title.replaceAllMapped(RegExp(r'\([^)]+\)'), (match) {
-    return '';
-  });
-  print(newString);
+  // A a = A();
+  // a.add(Future.delayed(const Duration(seconds: 2), () {
+  //   return (val) {
+  //     val += 1;
+  //     print(val);
+  //   };
+  // }));
+  // a.init();
+  Map test = {'sdf': () => sdf()};
+  print(test['sdf'] is Function);
 }
 
-enum A { test, last }
+sdf() {
+  return '123';
+}
+
+class A {
+  List<Future<void Function(int)>> inserts = [];
+  int i = 0;
+  add(Future<Function(int)> fn) {
+    inserts.add(fn);
+  }
+
+  init() async {
+    for (var function in inserts) {
+      Function.apply(await function, [i]);
+    }
+    print(i);
+  }
+}

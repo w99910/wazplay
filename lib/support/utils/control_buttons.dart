@@ -9,37 +9,45 @@ class ControlButton {
   static StreamBuilder<SequenceState?> buildNextButton(
       {Function? onPressed,
       required AudioPlayer audioPlayer,
+      bool? disable,
       double? iconSize}) {
     return StreamBuilder<SequenceState?>(
         stream: audioPlayer.sequenceStateStream,
         builder: (context, snapshot) {
           return IconButton(
-              onPressed: () => onPressed != null
+              onPressed: onPressed != null && disable != null
                   ? onPressed()
-                  : audioPlayer.hasNext
-                      ? audioPlayer.seekToNext()
-                      : null,
+                  : disable != null && disable
+                      ? null
+                      : audioPlayer.hasNext
+                          ? audioPlayer.seekToNext
+                          : null,
               iconSize: iconSize ?? defaultIconSize,
               icon: Icon(
                 Icons.skip_next,
-                color: audioPlayer.hasNext ? null : Colors.grey,
+                color: (disable != null && disable) || !audioPlayer.hasNext
+                    ? Colors.grey
+                    : null,
               ));
         });
   }
 
   static StreamBuilder<SequenceState?> buildPreviousButton(
       {Function? onPressed,
+      bool? disable,
       required AudioPlayer audioPlayer,
       double? iconSize}) {
     return StreamBuilder<SequenceState?>(
         stream: audioPlayer.sequenceStateStream,
         builder: (context, snapshot) {
           return IconButton(
-              onPressed: () => onPressed != null
+              onPressed: onPressed != null && disable != null
                   ? onPressed()
-                  : audioPlayer.hasPrevious
-                      ? audioPlayer.seekToPrevious()
-                      : null,
+                  : disable != null && disable
+                      ? null
+                      : audioPlayer.hasNext
+                          ? audioPlayer.seekToPrevious
+                          : null,
               iconSize: iconSize ?? defaultIconSize,
               icon: Icon(
                 Icons.skip_previous,
@@ -49,11 +57,17 @@ class ControlButton {
   }
 
   static StreamBuilder<bool> buildShuffleButton(AudioPlayer audioPlayer,
-      {double? iconSize, Color? enableColor, Color? disableColor}) {
+      {double? iconSize,
+      Color? enableColor,
+      Color? disableColor,
+      Function(bool)? onClick}) {
     return StreamBuilder<bool>(
       stream: audioPlayer.shuffleModeEnabledStream,
       builder: (context, snapshot) {
         final shuffleModeEnabled = snapshot.data ?? false;
+        if (onClick != null) {
+          onClick(shuffleModeEnabled);
+        }
         return IconButton(
           icon: shuffleModeEnabled
               ? Icon(Icons.shuffle, color: enableColor ?? Colors.blue)
@@ -84,7 +98,10 @@ class ControlButton {
   }
 
   static StreamBuilder<LoopMode> buildLoopButton(AudioPlayer audioPlayer,
-      {double? iconSize, Color? enableColor, Color? disableColor}) {
+      {double? iconSize,
+      Color? enableColor,
+      Color? disableColor,
+      Function(LoopMode)? onClick}) {
     return StreamBuilder<LoopMode>(
       stream: audioPlayer.loopModeStream,
       builder: (context, snapshot) {
@@ -100,6 +117,9 @@ class ControlButton {
           LoopMode.one,
         ];
         final index = cycleModes.indexOf(loopMode);
+        if (onClick != null) {
+          onClick(loopMode);
+        }
         return IconButton(
           icon: icons[index],
           onPressed: () {
@@ -140,7 +160,7 @@ class ControlButton {
   }
 
   static StreamBuilder<PlayerState> buildPlayButton(AudioPlayer audioPlayer,
-      {double? iconSize}) {
+      {double? iconSize, bool? disable}) {
     return StreamBuilder<PlayerState>(
         stream: audioPlayer.playerStateStream,
         builder: ((context, snapshot) {
@@ -150,14 +170,17 @@ class ControlButton {
           if (processingState == null ||
               processingState == ProcessingState.loading ||
               processingState == ProcessingState.buffering) {
-            return const SizedBox(
-                height: 26.0, width: 26.0, child: CircularProgressIndicator());
+            return SizedBox(
+                height: 26.0,
+                width: 26.0,
+                child: Transform.scale(
+                    scale: 0.5, child: const CircularProgressIndicator()));
           }
           if (isPlaying != true) {
             return IconButton(
               icon: const Icon(Icons.play_arrow),
               iconSize: iconSize ?? defaultIconSize,
-              onPressed: audioPlayer.play,
+              onPressed: disable != null && disable ? null : audioPlayer.play,
             );
           }
 
@@ -165,9 +188,7 @@ class ControlButton {
             return IconButton(
               icon: const Icon(Icons.pause),
               iconSize: iconSize ?? defaultIconSize,
-              onPressed: () {
-                audioPlayer.pause();
-              },
+              onPressed: disable != null && disable ? null : audioPlayer.pause,
             );
           } else {
             return IconButton(

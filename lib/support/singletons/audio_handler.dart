@@ -42,8 +42,17 @@ class CustomAudioHandler {
     }
   }
 
+  Future<bool> remove(int index) async {
+    if (_audioSource?.children.length == 1) {
+      return false;
+    }
+    await _audioSource?.removeAt(index);
+    return true;
+  }
+
   Future<Duration?> setAudioSource(List<Playable> playables) {
-    return audioPlayer.setAudioSource(toAudioSource(playables));
+    _audioSource = toAudioSource(playables);
+    return audioPlayer.setAudioSource(_audioSource!);
   }
 
   Widget get playButton {
@@ -68,7 +77,6 @@ class CustomAudioHandler {
     for (var playable in playables) {
       _audioSources.add(playable.getAudioSource());
     }
-    inspect(_audioSources);
     return ConcatenatingAudioSource(children: _audioSources);
   }
 }

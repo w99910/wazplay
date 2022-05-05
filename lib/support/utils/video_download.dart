@@ -52,7 +52,6 @@ class VideoDownload {
       throw Exception('Please check url is youtube link.');
     }
     var video = await yt.videos.get(url);
-    inspect(video);
     return {
       'title': video.title,
       'thumbnail': video.thumbnails.standardResUrl,
@@ -72,7 +71,7 @@ class VideoDownloadStream {
   String path;
   Stream<List<int>> audioStream;
   int totalSize;
-  StreamController<double> controller = StreamController<double>();
+  final StreamController<double> controller = StreamController<double>();
 
   Stream<double> get stream => controller.stream;
 
@@ -99,7 +98,9 @@ class VideoDownloadStream {
       var progress = ((count / size) * 100).ceil();
       controller.sink.add(progress / 100);
     }
-    controller.sink.close();
+    await controller.sink.close();
+    await controller.close();
+
     output.close();
   }
 }

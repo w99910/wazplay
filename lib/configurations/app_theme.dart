@@ -19,71 +19,53 @@ class AppTheme {
       fontFamily: 'Poppins',
       primaryColor: Colors.black,
       primaryColorDark: Colors.white,
+      popupMenuTheme: const PopupMenuThemeData(color: Colors.white),
+      // cardColor: const Color.fromARGB(255, 6, 6, 6),
+      cardColor: Colors.grey[100],
       scaffoldBackgroundColor: Colors.white,
       appBarTheme: const AppBarTheme(
-        systemOverlayStyle: SystemUiOverlayStyle.dark,
-      ),
+          systemOverlayStyle: SystemUiOverlayStyle.dark,
+          iconTheme: IconThemeData(color: Colors.black)),
       sliderTheme: SliderThemeData(
         thumbColor: Colors.black,
         activeTrackColor: Colors.black,
         inactiveTrackColor: Colors.grey[200],
       ),
+      iconTheme: const IconThemeData(
+        color: Colors.black,
+      ),
+      brightness: Brightness.light,
       textTheme: const TextTheme(
           subtitle1: TextStyle(
               fontWeight: FontWeight.w400), // Default style for TextField
           headline1: TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 28),
-          headline2: TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 26),
-          headline3: TextStyle(
               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24),
+          headline2: TextStyle(
+              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 22),
+          headline3: TextStyle(
+              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
           headline4: TextStyle(
             color: Colors.black,
-            fontSize: 22,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
           headline5: TextStyle(
             color: Colors.black,
-            fontSize: 20,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
           headline6: TextStyle(
             color: Colors.black,
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
           bodyText2: TextStyle(color: Colors.black),
           caption: TextStyle(color: Colors.grey, fontSize: 14),
           button: TextStyle(color: Colors.blue),
           bodyText1: TextStyle(height: 1.5, letterSpacing: 1.2)),
-      // dialogBackgroundColor: const Color(0xFF1B1B2F),
-      // backgroundColor: Colors.white,
-      // bottomSheetTheme: const BottomSheetThemeData(
-      //   backgroundColor: Color(0xFF1B1B2F),
-      // ),
-      // primarySwatch: colorScheme,
-      // primaryColor: Colors.black,
-      // brightness: Brightness.dark,
-      // primaryColorLight: Colors.black,
-      // indicatorColor: Colors.black,
-      // cardColor: Colors.black,
-      // colorScheme: const ColorScheme.dark()
-      //     .copyWith(primary: Color.fromARGB(255, 0, 0, 0)),
-      // textButtonTheme: TextButtonThemeData(
-      //     style: TextButton.styleFrom(
-      //         alignment: Alignment.bottomCenter,
-      //         textStyle:
-      //             const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))),
-      // elevatedButtonTheme: ElevatedButtonThemeData(
-      //     style: ElevatedButton.styleFrom(
-      //   primary: Colors.black,
-      // )),
-      // appBarTheme: const AppBarTheme(
-      //   iconTheme: IconThemeData(
-      //     color: Colors.white,
-      //   ),
-      //   backgroundColor: darkScaffoldBackgroundColor,
-      // ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: Colors.black,
+      ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: Colors.black,
         selectedItemColor: Colors.white,
@@ -94,23 +76,66 @@ class AppTheme {
 
   static ThemeData darkTheme = ThemeData(
       fontFamily: 'Poppins',
-      scaffoldBackgroundColor: Colors.white,
+      primaryColor: Colors.white,
+      brightness: Brightness.dark,
+      dialogTheme:
+          const DialogTheme(backgroundColor: Color.fromARGB(255, 14, 9, 27)),
+      bottomSheetTheme: const BottomSheetThemeData(
+          backgroundColor: Color.fromARGB(255, 14, 9, 27)),
+      cardColor: const Color.fromARGB(255, 14, 9, 27),
+      popupMenuTheme:
+          const PopupMenuThemeData(color: Color.fromARGB(255, 16, 16, 35)),
+      primaryColorDark: const Color.fromARGB(255, 0, 0, 0),
+      scaffoldBackgroundColor: const Color.fromARGB(255, 5, 1, 24),
+      appBarTheme: const AppBarTheme(
+          systemOverlayStyle: SystemUiOverlayStyle.light,
+          iconTheme: IconThemeData(color: Colors.white)),
+      sliderTheme: SliderThemeData(
+        thumbColor: Colors.white,
+        activeTrackColor: Colors.grey[50],
+        inactiveTrackColor: Colors.grey[200],
+      ),
+      iconTheme: const IconThemeData(
+        color: Colors.white,
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: Colors.white,
+      ),
       textTheme: const TextTheme(
-          subtitle1: TextStyle(fontWeight: FontWeight.bold),
+          subtitle1: TextStyle(
+              fontWeight: FontWeight.w400), // Default style for TextField
           headline1: TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 24),
           headline2: TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+          headline3: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
           headline4: TextStyle(
-              color: Colors.black,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-              height: 1.4),
-          headline6: TextStyle(color: Colors.white),
-          caption: TextStyle(color: Colors.black),
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+          headline5: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+          headline6: TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
+          bodyText2: TextStyle(color: Colors.white),
+          caption: TextStyle(color: Colors.grey, fontSize: 14),
           button: TextStyle(color: Colors.blue),
-          bodyText1: TextStyle(height: 1.5, letterSpacing: 1.2)));
+          bodyText1: TextStyle(height: 1.5, letterSpacing: 1.2)),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: Colors.black,
+        selectedItemColor: Colors.white,
+        type: BottomNavigationBarType.fixed,
+        unselectedItemColor: Colors.grey[600],
+        elevation: 0,
+      ));
 
   static const Color darkScaffoldBackgroundColor = Colors.black12;
   static final colorScheme = MaterialColor(0x00000000, color);

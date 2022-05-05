@@ -2,17 +2,17 @@ import 'dart:developer';
 
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:get/instance_manager.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wazplay/controllers/music_controller.dart';
 import 'package:wazplay/controllers/song_controller.dart';
 import 'package:wazplay/support/interfaces/playable.dart';
+import 'package:wazplay/support/models/song.dart';
 import 'package:wazplay/support/singletons/audio_handler.dart';
 import 'package:wazplay/support/utils/control_buttons.dart';
 import 'package:wazplay/support/utils/custom_rect_tween.dart';
-import 'package:wazplay/support/utils/hero_dialog_route.dart';
 import 'package:wazplay/widgets/custom_image.dart';
 import 'package:wazplay/widgets/music_player.dart';
 
@@ -30,13 +30,15 @@ class MusicPlayerPreview extends StatefulWidget {
   State<MusicPlayerPreview> createState() => _MusicPlayerPreviewState();
 }
 
-class _MusicPlayerPreviewState extends State<MusicPlayerPreview> {
+class _MusicPlayerPreviewState extends State<MusicPlayerPreview>
+    with AutomaticKeepAliveClientMixin {
   late CustomAudioHandler _audioHandler;
   late AudioPlayer _audioPlayer;
   late Playable _currentTrack;
   late List<Playable> _playables;
   late MusicController _musicController;
   late SongController _songController;
+  late SharedPreferences _sharedPreferences;
   bool _loading = true;
 
   @override
@@ -58,9 +60,15 @@ class _MusicPlayerPreviewState extends State<MusicPlayerPreview> {
       setState(() {
         _playables = value;
       });
-      _musicController.currentTrack.value = _currentTrack;
-      await _audioHandler.setAudioSource(value);
-      _audioPlayer.play();
+
+      if (value.isNotEmpty) {
+        _musicController.currentTrack.value = _currentTrack;
+        await _audioHandler.setAudioSource(value);
+        _audioPlayer.play();
+      } else {
+        _musicController.currentTrack.value =
+            Song(id: 1, title: "", author: "", path: "", thumbnail: null);
+      }
     });
     _musicController.currentTrack.listen((track) {
       if (track != null) {
@@ -72,6 +80,17 @@ class _MusicPlayerPreviewState extends State<MusicPlayerPreview> {
   }
 
   init() async {
+    _sharedPreferences = await SharedPreferences.getInstance();
+    String? loopMode = _sharedPreferences.getString('loopMode');
+    bool? isShuffle = _sharedPreferences.getBool('isShuffle');
+    if (loopMode != null) {
+      _audioPlayer.setLoopMode(
+          LoopMode.values.firstWhere((element) => element.name == loopMode));
+    }
+    if (isShuffle != null) {
+      _audioPlayer.setShuffleModeEnabled(isShuffle);
+    }
+
     //Set Audio Source
     await _audioHandler.setAudioSource(_playables);
     //Set Audio Session
@@ -104,6 +123,7 @@ class _MusicPlayerPreviewState extends State<MusicPlayerPreview> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return _loading
         ? const Center(
             child: CircularProgressIndicator.adaptive(),
@@ -117,14 +137,16 @@ class _MusicPlayerPreviewState extends State<MusicPlayerPreview> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                            context,
-                            HeroDialogRoute(
-                                builder: (BuildContext buildContext) =>
-                                    MusicPlayer(
-                                      currentTrack: _currentTrack,
-                                      playables: _playables,
-                                    )));
+                        if (_playables.isNotEmpty) {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (BuildContext buildContext) =>
+                                      MusicPlayer(
+                                        currentTrack: _currentTrack,
+                                        playables: _playables,
+                                      )));
+                        }
                       },
                       child: Row(
                         children: [
@@ -146,9 +168,12 @@ class _MusicPlayerPreviewState extends State<MusicPlayerPreview> {
                         ],
                       ),
                     ),
-                    ControlButton.buildPlayButton(_audioPlayer, iconSize: 32),
+                    ControlButton.buildPlayButton(_audioPlayer,
+                        iconSize: 32, disable: _playables.isEmpty),
                     ControlButton.buildNextButton(
-                        audioPlayer: _audioPlayer, iconSize: 30),
+                        audioPlayer: _audioPlayer,
+                        iconSize: 30,
+                        disable: _playables.isEmpty),
                   ]),
             ),
           );
@@ -179,4 +204,7 @@ class _MusicPlayerPreviewState extends State<MusicPlayerPreview> {
             ),
           );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

@@ -5,6 +5,8 @@ import 'package:get/instance_manager.dart';
 import 'package:wazplay/controllers/music_controller.dart';
 import 'package:wazplay/controllers/song_controller.dart';
 import 'package:wazplay/support/models/song.dart';
+import 'package:wazplay/support/singletons/app.dart';
+import 'package:wazplay/support/utils/greeting.dart';
 import 'package:wazplay/widgets/info_box.dart';
 import 'package:wazplay/widgets/preview.dart';
 
@@ -16,7 +18,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<Song> songs = [];
   List<Song> recentlyAdded = [];
   List<Song> recentlyPlayed = [];
   late SongController songController;
@@ -26,19 +27,32 @@ class _HomeState extends State<Home> {
   void initState() {
     songController = SongController();
     musicController = Get.find<MusicController>();
-    init();
     super.initState();
+    load();
+    musicController.shouldReloadSongs.listen((p0) {
+      load();
+      // print('load');
+    });
   }
 
-  init() async {
-    songs.addAll(await songController.all());
-    recentlyAdded.addAll(songs);
-    recentlyPlayed.addAll(songs);
+  load() async {
+    recentlyAdded = [];
+    recentlyPlayed = [];
+    // songs.addAll(await songController.all());
+    recentlyAdded.addAll(await songController.all(
+        orderBy: 'createdAt', descending: true, limit: 5));
+    recentlyPlayed.addAll(await songController.all(
+        orderBy: 'updatedAt', descending: true, limit: 5));
     setState(() {
-      recentlyAdded.sort((a, b) => b.createdAt!.compareTo(a.createdAt!));
-      recentlyPlayed.sort((a, b) => b.updatedAt!.compareTo(a.updatedAt!));
+      recentlyAdded = recentlyAdded;
+      recentlyPlayed = recentlyPlayed;
       loading = false;
     });
+  }
+
+  @override
+  void setState(VoidCallback fn) {
+    if (mounted) super.setState(fn);
   }
 
   @override
@@ -54,18 +68,19 @@ class _HomeState extends State<Home> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Hi Zaw,',
+                    Greeting.getMessage(),
+                    maxLines: 2,
                     style: Theme.of(context)
                         .textTheme
-                        .headline2!
-                        .copyWith(fontWeight: FontWeight.w400),
+                        .headline3!
+                        .copyWith(fontWeight: FontWeight.w700, fontSize: 22),
                   ),
                   const SizedBox(height: 20),
                   Text('Recently Played',
                       style: Theme.of(context)
                           .textTheme
                           .headline4!
-                          .copyWith(fontWeight: FontWeight.w600)),
+                          .copyWith(fontWeight: FontWeight.w500)),
                   const SizedBox(height: 20),
                   recentlyPlayed.isNotEmpty
                       ? SizedBox(
@@ -88,7 +103,7 @@ class _HomeState extends State<Home> {
                                   },
                                   child: Preview(
                                       previewAble: recentlyPlayed[index],
-                                      width: size.width * 0.45,
+                                      width: size.width * 0.35,
                                       height: size.height * 0.3),
                                 );
                               },
@@ -97,14 +112,18 @@ class _HomeState extends State<Home> {
                                   ),
                               itemCount: recentlyPlayed.length),
                         )
-                      : InfoBox(
-                          width: size.width * 0.45,
-                          height: size.height * 0.22,
-                          messageTextStyle: const TextStyle(
-                            color: Colors.white,
-                          ),
-                          bgColor: Colors.black,
-                          message: 'Add New Song'),
+                      : Align(
+                          alignment: Alignment.center,
+                          child: InfoBox(
+                              width: size.width * 0.9,
+                              height: size.height * 0.22,
+                              onPressed: () {
+                                App.instance.routeController.currentTabIndex
+                                    .value = 2;
+                              },
+                              bgColor: Theme.of(context).cardColor,
+                              message: 'Add New Song +'),
+                        ),
                   const SizedBox(height: 8),
                   const Divider(),
                   const SizedBox(height: 8),
@@ -112,7 +131,7 @@ class _HomeState extends State<Home> {
                       style: Theme.of(context)
                           .textTheme
                           .headline4!
-                          .copyWith(fontWeight: FontWeight.w600)),
+                          .copyWith(fontWeight: FontWeight.w500)),
                   const SizedBox(height: 20),
                   recentlyAdded.isNotEmpty
                       ? SizedBox(
@@ -135,7 +154,7 @@ class _HomeState extends State<Home> {
                                   },
                                   child: Preview(
                                       previewAble: recentlyAdded[index],
-                                      width: size.width * 0.45,
+                                      width: size.width * 0.35,
                                       height: size.height * 0.3),
                                 );
                               },
@@ -144,22 +163,29 @@ class _HomeState extends State<Home> {
                                   ),
                               itemCount: recentlyAdded.length),
                         )
-                      : InfoBox(
-                          width: size.width * 0.45,
-                          height: size.height * 0.22,
-                          messageTextStyle: const TextStyle(
-                            color: Colors.white,
-                          ),
-                          bgColor: Colors.black,
-                          message: 'Add New Song'),
+                      : Align(
+                          alignment: Alignment.center,
+                          child: InfoBox(
+                              width: size.width * 0.9,
+                              height: size.height * 0.22,
+                              onPressed: () {
+                                App.instance.routeController.currentTabIndex
+                                    .value = 2;
+                              },
+                              bgColor: Theme.of(context).cardColor,
+                              message: 'Add New Song +'),
+                        ),
                   const SizedBox(height: 8),
                   const Divider(),
                   const SizedBox(height: 8),
-                  Text('Playlists',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline4!
-                          .copyWith(fontWeight: FontWeight.w600)),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: Text('Playlists',
+                        style: Theme.of(context)
+                            .textTheme
+                            .headline4!
+                            .copyWith(fontWeight: FontWeight.w500)),
+                  ),
                   const SizedBox(height: 20),
                   SizedBox(
                     width: size.width,
@@ -167,14 +193,13 @@ class _HomeState extends State<Home> {
                     child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemBuilder: (BuildContext buildcontext, int index) {
-                          return InfoBox(
-                            height: size.height * 0.15,
-                            width: size.width * 0.45,
-                            bgColor: Colors.black,
-                            message: 'Create Playlist',
-                            messageTextStyle: const TextStyle(
-                              color: Colors.white,
-                            ),
+                          return Align(
+                            alignment: Alignment.center,
+                            child: InfoBox(
+                                width: size.width * 0.9,
+                                height: size.height * 0.22,
+                                bgColor: Theme.of(context).cardColor,
+                                message: 'Create New Playlist +'),
                           );
                         },
                         separatorBuilder: (_, __) => const SizedBox(

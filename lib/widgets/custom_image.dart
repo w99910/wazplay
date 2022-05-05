@@ -20,12 +20,32 @@ class CustomImage extends StatelessWidget {
             width: width,
             height: height,
             fit: boxFit ?? BoxFit.contain,
+            loadingBuilder: (BuildContext context, Widget child,
+                ImageChunkEvent? chunkEvent) {
+              if (chunkEvent == null) {
+                return child;
+              }
+              return fallbackWidget(context);
+            },
+            errorBuilder: (_, __, ___) => fallbackWidget(context),
           )
         : Image.file(
             File(url),
             width: width,
             height: height,
             fit: boxFit ?? BoxFit.contain,
+            errorBuilder: (_, __, ___) => fallbackWidget(context),
           );
+  }
+
+  Widget fallbackWidget(BuildContext context) {
+    return Container(
+      height: height,
+      width: width,
+      color: Theme.of(context).cardColor,
+      child: Center(
+          child:
+              Icon(Icons.music_note, size: width != null ? width! * 0.25 : 24)),
+    );
   }
 }

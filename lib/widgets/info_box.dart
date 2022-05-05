@@ -5,10 +5,12 @@ class InfoBox extends StatelessWidget {
   final TextStyle? messageTextStyle;
   final String message;
   final double width, height;
+  final Function? onPressed;
   const InfoBox(
       {Key? key,
       this.bgColor = Colors.blue,
       this.messageTextStyle,
+      this.onPressed,
       required this.width,
       required this.height,
       required this.message})
@@ -16,18 +18,21 @@ class InfoBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(width / 20),
-        color: bgColor,
+    return GestureDetector(
+      onTap: () => onPressed != null ? onPressed!() : null,
+      child: Container(
+        width: width,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(width / 20),
+          color: bgColor,
+        ),
+        height: height,
+        child: Center(
+            child: Text(
+          message,
+          style: messageTextStyle,
+        )),
       ),
-      height: height,
-      child: Center(
-          child: Text(
-        message,
-        style: messageTextStyle,
-      )),
     );
   }
 }

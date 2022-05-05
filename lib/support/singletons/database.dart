@@ -6,7 +6,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:wazplay/support/eloquents/song.dart';
 import 'package:wazplay/support/models/song.dart';
 
-class DB {
+class DB12 {
   static const idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';
   static const boolType = 'BOOLEAN NOT NULL';
   static const integerType = 'INTEGER NOT NULL';
@@ -14,9 +14,9 @@ class DB {
 
   final String fileName = 'wazplay-0.0.3.db';
 
-  static final DB instance = DB._init();
+  static final DB12 instance = DB12._init();
 
-  DB._init();
+  DB12._init();
 
   static Database? _database;
 
@@ -58,9 +58,9 @@ class DB {
     }
     return await openDatabase(path, version: 1,
         onCreate: (Database db, int version) async {
-      await SongEloquent.onCreate(db, version);
+      // await SongEloquent.onCreate(db, version);
     }, onOpen: (Database db) async {
-      await SongEloquent.onOpen(db);
+      // await SongEloquent.onOpen(db);
     });
   }
 }

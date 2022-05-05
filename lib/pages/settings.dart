@@ -13,9 +13,8 @@ class Settings extends StatefulWidget {
 
 class _SettingsState extends State<Settings>
     with AutomaticKeepAliveClientMixin {
-  bool isDarkMode = false;
-  bool isAutoDownloadLyrics = true;
-  bool isAutoDownloadThumbnail = true;
+  late bool isDarkMode;
+  late bool isAutoDownloadThumbnail;
   late bool isVibratable;
 
   Configuration configuration = App.instance.configuration;
@@ -23,6 +22,8 @@ class _SettingsState extends State<Settings>
   @override
   void initState() {
     isVibratable = configuration.vibrateable;
+    isDarkMode = configuration.isDarkMode;
+    isAutoDownloadThumbnail = configuration.autoDownloadThumb;
     super.initState();
   }
 
@@ -65,13 +66,14 @@ class _SettingsState extends State<Settings>
                             .headline6!
                             .copyWith(fontWeight: FontWeight.w500),
                       )),
-                      CupertinoSwitch(
+                      Switch.adaptive(
                           value: isDarkMode,
                           onChanged: (val) {
                             HapticFeedback.mediumImpact();
                             setState(() {
                               isDarkMode = val;
                             });
+                            configuration.toggleDarkMode();
                           })
                     ],
                   ),
@@ -111,37 +113,13 @@ class _SettingsState extends State<Settings>
                             .headline6!
                             .copyWith(fontWeight: FontWeight.w500),
                       )),
-                      CupertinoSwitch(
+                      Switch.adaptive(
                           value: isVibratable,
                           onChanged: (val) {
                             setState(() {
                               isVibratable = val;
                             });
-                            configuration.vibrateable = val;
-                          })
-                    ],
-                  ),
-                  ...buildDivider(12),
-                  Row(
-                    children: [
-                      const Icon(Icons.download),
-                      const SizedBox(
-                        width: 16,
-                      ),
-                      Expanded(
-                          child: Text(
-                        'Auto Download Lyrics',
-                        style: Theme.of(context)
-                            .textTheme
-                            .headline6!
-                            .copyWith(fontWeight: FontWeight.w500),
-                      )),
-                      CupertinoSwitch(
-                          value: isAutoDownloadLyrics,
-                          onChanged: (val) {
-                            setState(() {
-                              isAutoDownloadLyrics = val;
-                            });
+                            configuration.toggleVibration();
                           })
                     ],
                   ),
@@ -160,12 +138,13 @@ class _SettingsState extends State<Settings>
                             .headline6!
                             .copyWith(fontWeight: FontWeight.w500),
                       )),
-                      CupertinoSwitch(
+                      Switch.adaptive(
                           value: isAutoDownloadThumbnail,
                           onChanged: (val) {
                             setState(() {
                               isAutoDownloadThumbnail = val;
                             });
+                            configuration.toggleAutoDownloadThumbnail();
                           })
                     ],
                   ),
