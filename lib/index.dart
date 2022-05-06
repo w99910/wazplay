@@ -1,15 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:get/instance_manager.dart';
 import 'package:wazplay/controllers/music_controller.dart';
 import 'package:wazplay/pages/add_new.dart';
 import 'package:wazplay/pages/home.dart';
 import 'package:wazplay/pages/library.dart';
 import 'package:wazplay/pages/settings.dart';
-import 'package:wazplay/support/eloquents/song.dart';
 import 'package:wazplay/support/singletons/app.dart';
 import 'package:wazplay/widgets/logo.dart';
 import 'package:wazplay/support/singletons/configuration.dart';
@@ -19,7 +15,7 @@ final List<Widget> pages = [
   const Home(),
   const Library(),
   const AddNewSong(),
-  const Settings()
+  const Settings(),
 ];
 
 class Index extends StatefulWidget {

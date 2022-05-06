@@ -80,27 +80,6 @@ class _SettingsState extends State<Settings>
                   ...buildDivider(12),
                   Row(
                     children: [
-                      const Icon(Icons.app_settings_alt),
-                      const SizedBox(
-                        width: 16,
-                      ),
-                      Expanded(
-                          child: Text(
-                        'Theme',
-                        style: Theme.of(context)
-                            .textTheme
-                            .headline6!
-                            .copyWith(fontWeight: FontWeight.w500),
-                      )),
-                      Text(
-                        'Solid',
-                        style: Theme.of(context).textTheme.caption,
-                      ),
-                    ],
-                  ),
-                  ...buildDivider(12),
-                  Row(
-                    children: [
                       const Icon(Icons.vibration),
                       const SizedBox(
                         width: 16,

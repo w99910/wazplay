@@ -15,7 +15,7 @@ import 'package:wazplay/support/eloquents/song.dart';
 Future<void> main() async {
   DB db = DB.instance;
   db.setDbVersion(1);
-  db.setFileName('wazplay-1.0.0.db');
+  db.setFileName('wazplay-1.0.1.db');
   db.onCreate([SongEloquent.onCreate, PlaylistEloquent.onCreate]);
   db.onOpen([SongEloquent.onOpen, PlaylistEloquent.onOpen]);
   db.onConfigure([

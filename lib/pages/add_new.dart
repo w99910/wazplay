@@ -28,7 +28,7 @@ class _AddNewSongState extends State<AddNewSong>
   late SongEloquent songEloquent;
   late MusicController _musicController;
   int loadingSongIndex = 0;
-  int totalCurrentSongs = 0;
+  List<int> totalCurrentSongs = [];
   List<int> downloadedSongs = [];
   Map<int, VideoDownloadStream?> videoDownloadStreams = {};
   late TextEditingController _textEditingController;
@@ -145,11 +145,13 @@ class _AddNewSongState extends State<AddNewSong>
                     elevation: 0,
                     child: InkWell(
                       onTap: () async {
+                        int newIndex = totalCurrentSongs.isEmpty
+                            ? 0
+                            : totalCurrentSongs.last + 1;
                         try {
                           FocusScope.of(context).unfocus();
-                          int currentTotal = songs.length;
                           setState(() {
-                            totalCurrentSongs = currentTotal + 1;
+                            totalCurrentSongs.add(newIndex);
                           });
                           var song = Song.temp(await VideoDownload.getDetail(
                               _textEditingController.text.trim()));
@@ -160,7 +162,7 @@ class _AddNewSongState extends State<AddNewSong>
                           Future.delayed(const Duration(milliseconds: 300),
                               () async {
                             setState(() {
-                              totalCurrentSongs -= 1;
+                              totalCurrentSongs.remove(newIndex);
                             });
                             await showCupertinoDialog(
                               context: context,
@@ -196,7 +198,7 @@ class _AddNewSongState extends State<AddNewSong>
             ),
             const SizedBox(height: 24),
             Expanded(
-              child: totalCurrentSongs == 0
+              child: totalCurrentSongs.isEmpty
                   ? Center(
                       child: SizedBox(
                         width: size.width * 0.5,
@@ -209,7 +211,8 @@ class _AddNewSongState extends State<AddNewSong>
                   : ListView.separated(
                       scrollDirection: Axis.vertical,
                       itemBuilder: (BuildContext context, int index) {
-                        return totalCurrentSongs > songs.length &&
+                        int currentIndex = totalCurrentSongs[index];
+                        return totalCurrentSongs.length > songs.length &&
                                 index > songs.length - 1
                             ? Preview(
                                 previewAble: null,
@@ -223,9 +226,10 @@ class _AddNewSongState extends State<AddNewSong>
                                 axis: Axis.horizontal,
                                 height: size.height * 0.1,
                                 actions: Row(children: [
-                                  videoDownloadStreams[index] != null
+                                  videoDownloadStreams[currentIndex] != null
                                       ? StreamBuilder<double>(
-                                          stream: videoDownloadStreams[index]!
+                                          stream: videoDownloadStreams[
+                                                  currentIndex]!
                                               .stream,
                                           builder: (BuildContext buildcontext,
                                               AsyncSnapshot asyncSnapshot) {
@@ -293,6 +297,8 @@ class _AddNewSongState extends State<AddNewSong>
                                               })
                                           : IconButton(
                                               onPressed: () async {
+                                                inspect(totalCurrentSongs);
+                                                inspect(currentIndex);
                                                 VideoDownloadStream
                                                     videoDownloadStream =
                                                     await VideoDownload
@@ -300,7 +306,8 @@ class _AddNewSongState extends State<AddNewSong>
                                                             songs[index].path);
                                                 videoDownloadStream.download();
                                                 setState(() {
-                                                  videoDownloadStreams[index] =
+                                                  videoDownloadStreams[
+                                                          currentIndex] =
                                                       videoDownloadStream;
                                                 });
                                               },
@@ -309,8 +316,10 @@ class _AddNewSongState extends State<AddNewSong>
                                       onPressed: () {
                                         setState(() {
                                           songs.removeAt(index);
-                                          videoDownloadStreams.remove(index);
-                                          totalCurrentSongs -= 1;
+                                          videoDownloadStreams
+                                              .remove(currentIndex);
+                                          totalCurrentSongs
+                                              .remove(currentIndex);
                                           downloadedSongs.remove(index);
                                         });
                                       },
@@ -324,7 +333,7 @@ class _AddNewSongState extends State<AddNewSong>
                       separatorBuilder: (BuildContext context, int index) {
                         return const SizedBox(height: 12);
                       },
-                      itemCount: totalCurrentSongs),
+                      itemCount: totalCurrentSongs.length),
             )
           ],
         ));

@@ -6,11 +6,15 @@ class InfoBox extends StatelessWidget {
   final String message;
   final double width, height;
   final Function? onPressed;
+  final EdgeInsets? padding;
+  final TextAlign? textAlign;
   const InfoBox(
       {Key? key,
       this.bgColor = Colors.blue,
       this.messageTextStyle,
       this.onPressed,
+      this.padding,
+      this.textAlign,
       required this.width,
       required this.height,
       required this.message})
@@ -21,6 +25,7 @@ class InfoBox extends StatelessWidget {
     return GestureDetector(
       onTap: () => onPressed != null ? onPressed!() : null,
       child: Container(
+        padding: padding,
         width: width,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(width / 20),
@@ -30,6 +35,7 @@ class InfoBox extends StatelessWidget {
         child: Center(
             child: Text(
           message,
+          textAlign: textAlign,
           style: messageTextStyle,
         )),
       ),

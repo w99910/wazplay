@@ -8,8 +8,11 @@ void main() {
   //   };
   // }));
   // a.init();
-  Map test = {'sdf': () => sdf()};
-  print(test['sdf'] is Function);
+  List<Map> test = [
+    {'sdf': '12345'},
+    {'sdf': '33'}
+  ];
+  print(test.asMap().values.where((element) => element['sdf'] == '33').isEmpty);
 }
 
 sdf() {

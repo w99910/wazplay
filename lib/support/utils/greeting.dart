@@ -3,8 +3,6 @@ import 'dart:math';
 class Greeting {
   static Period getPeriod() {
     DateTime time = DateTime.now();
-    print(time.timeZoneName);
-    print(time);
     int hour = time.hour;
     if (hour >= 6 && hour < 12) {
       return Period.morning;

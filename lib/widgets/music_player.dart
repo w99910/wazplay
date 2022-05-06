@@ -9,8 +9,10 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'package:rxdart/rxdart.dart' as RxDart;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wazplay/controllers/music_controller.dart';
+import 'package:wazplay/controllers/playlist_controller.dart';
 import 'package:wazplay/controllers/song_controller.dart';
 import 'package:wazplay/support/interfaces/playable.dart';
+import 'package:wazplay/support/models/playlist.dart';
 import 'package:wazplay/support/singletons/audio_handler.dart';
 import 'package:wazplay/support/utils/control_buttons.dart';
 import 'package:wazplay/support/utils/custom_rect_tween.dart';
@@ -39,11 +41,13 @@ class _MusicPlayerState extends State<MusicPlayer> {
   late List<Playable> _playables;
   late MusicController _musicController;
   late SongController _songController;
+  late PlaylistController _playlistController;
   @override
   void initState() {
     _playables = widget.playables;
     _musicController = Get.find<MusicController>();
     _songController = Get.find<SongController>();
+    _playlistController = Get.find<PlaylistController>();
     _audioHandler = CustomAudioHandler.instance;
     _audioPlayer = _audioHandler.audioPlayer;
     _currentTrack = widget.currentTrack;
@@ -125,6 +129,78 @@ class _MusicPlayerState extends State<MusicPlayer> {
               PopupMenuItem(
                   onTap: () async {
                     Future.delayed(const Duration(milliseconds: 50), () async {
+                      await showModalBottomSheet(
+                          shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(14),
+                                  topRight: Radius.circular(14))),
+                          isScrollControlled: true,
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Container(
+                              height: size.height * 0.6,
+                              width: size.width,
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 16, horizontal: 12),
+                              child: FutureBuilder(
+                                  future: _playlistController.getPlaylists(),
+                                  builder: (_,
+                                      AsyncSnapshot<List<Playlist>> snapshot) {
+                                    if (!snapshot.hasData) {
+                                      return const CircularProgressIndicator
+                                          .adaptive();
+                                    }
+                                    List<Playlist> playlists = snapshot.data!;
+                                    return ListView.separated(
+                                        itemBuilder: (_, int index) {
+                                          return SizedBox();
+                                        },
+                                        separatorBuilder: (_, __) =>
+                                            const SizedBox(height: 12),
+                                        itemCount: playlists.length);
+                                  }),
+                            );
+                          });
+                      // bool confirm = false;
+                      // await showDialog(
+                      //     context: context,
+                      //     builder: (builder) {
+                      //       return CupertinoAlertDialog(
+                      //         title: const Text(
+                      //             'Are you sure to delete the song?'),
+                      //         actions: [
+                      //           TextButton(
+                      //               onPressed: () {
+                      //                 Navigator.pop(context);
+                      //                 confirm = true;
+                      //               },
+                      //               child: Text('Yes',
+                      //                   style:
+                      //                       TextStyle(color: Colors.red[400]))),
+                      //           TextButton(
+                      //               onPressed: () {
+                      //                 Navigator.pop(context);
+                      //               },
+                      //               child: Text('No',
+                      //                   style:
+                      //                       TextStyle(color: Colors.red[400]))),
+                      //         ],
+                      //       );
+                      //     });
+
+                      // if (confirm) {
+                      //   delete(_currentTrack);
+                      // }
+                    });
+                  },
+                  child: const ListTile(
+                    leading: Icon(Icons.delete),
+                    dense: true,
+                    title: Text('Add to playlist'),
+                  )),
+              PopupMenuItem(
+                  onTap: () async {
+                    Future.delayed(const Duration(milliseconds: 50), () async {
                       bool confirm = false;
                       await showDialog(
                           context: context,
@@ -138,12 +214,16 @@ class _MusicPlayerState extends State<MusicPlayer> {
                                       Navigator.pop(context);
                                       confirm = true;
                                     },
-                                    child: const Text('Yes')),
+                                    child: Text('Yes',
+                                        style:
+                                            TextStyle(color: Colors.red[400]))),
                                 TextButton(
                                     onPressed: () {
                                       Navigator.pop(context);
                                     },
-                                    child: const Text('No'))
+                                    child: Text('No',
+                                        style:
+                                            TextStyle(color: Colors.red[400]))),
                               ],
                             );
                           });
@@ -157,7 +237,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
                     leading: Icon(Icons.delete),
                     dense: true,
                     title: Text('Delete'),
-                  ))
+                  )),
             ],
             child: const Padding(
               padding: EdgeInsets.all(8.0),

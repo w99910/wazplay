@@ -41,6 +41,8 @@ class VideoDownload {
         .replaceAll('|', '');
     var filePath = dir + '/' + fileName;
 
+    print('video download stream');
+
     return VideoDownloadStream(
         path: filePath,
         audioStream: audioStream,
@@ -104,3 +106,5 @@ class VideoDownloadStream {
     output.close();
   }
 }
+
+class DownloadItem {}

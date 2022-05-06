@@ -23,7 +23,12 @@ class AppTheme {
       // cardColor: const Color.fromARGB(255, 6, 6, 6),
       cardColor: Colors.grey[100],
       scaffoldBackgroundColor: Colors.white,
+      checkboxTheme: CheckboxThemeData(
+          checkColor: MaterialStateProperty.all(Colors.white),
+          fillColor: MaterialStateProperty.all(Colors.black)),
       appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle.dark,
           iconTheme: IconThemeData(color: Colors.black)),
       sliderTheme: SliderThemeData(
@@ -88,6 +93,8 @@ class AppTheme {
       primaryColorDark: const Color.fromARGB(255, 0, 0, 0),
       scaffoldBackgroundColor: const Color.fromARGB(255, 5, 1, 24),
       appBarTheme: const AppBarTheme(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
           systemOverlayStyle: SystemUiOverlayStyle.light,
           iconTheme: IconThemeData(color: Colors.white)),
       sliderTheme: SliderThemeData(
@@ -101,6 +108,9 @@ class AppTheme {
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: Colors.white,
       ),
+      checkboxTheme: CheckboxThemeData(
+          checkColor: MaterialStateProperty.all(Colors.black),
+          fillColor: MaterialStateProperty.all(Colors.white)),
       textTheme: const TextTheme(
           subtitle1: TextStyle(
               fontWeight: FontWeight.w400), // Default style for TextField
