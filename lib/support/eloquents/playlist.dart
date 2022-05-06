@@ -46,27 +46,29 @@ class PlaylistEloquent extends BaseEloquent {
   }
 
   Future<int?> saveSongs(
-      {required List<Song> songs, required Playlist playlist}) async {
+      {required List<int> songs, required Playlist playlist}) async {
     if (songs.isEmpty) {
       return null;
     }
     Database db = await DB.instance.getDB();
     var checkSongs = await db.rawQuery(
         'SELECT playlist_songs.songId from playlist_songs WHERE playlistId = ${playlist.id}');
+    int? status;
     for (var song in songs) {
+      inspect(song);
       if (checkSongs.isNotEmpty &&
           checkSongs
               .asMap()
               .values
-              .where((element) => element['songId'] == song.id.toString())
+              .where((element) => element['songId'] == song)
               .isNotEmpty) {
         continue;
       }
-      print('added songId - ${song.id}');
       await db.rawInsert(
-          'INSERT INTO playlist_songs (playlistId,songId) values (${playlist.id},${song.id})');
+          'INSERT INTO playlist_songs (playlistId,songId) values (${playlist.id},$song)');
+      status = 1;
     }
-    return 1;
+    return status;
   }
 
   @override

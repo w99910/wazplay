@@ -29,7 +29,7 @@ class PlaylistController {
   }
 
   Future<int?> updateSongs(
-      {required List<Song> songs, required Playlist playlist}) async {
+      {required List<int> songs, required Playlist playlist}) async {
     return await playlistEloquent.saveSongs(songs: songs, playlist: playlist);
   }
 

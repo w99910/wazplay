@@ -163,7 +163,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                           builder: (builder) {
                             return CupertinoAlertDialog(
                               title: const Text(
-                                  'Are you sure to delete the song?'),
+                                  'Are you sure to delete the playlist?'),
                               actions: [
                                 TextButton(
                                     onPressed: () {
@@ -384,7 +384,6 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           Timer? timer;
           String? keyword;
           List<Song> loadedSongs = [];
-          inspect(currentSongs);
           return StatefulBuilder(builder: (context, customSetState) {
             return Container(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
@@ -493,7 +492,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                               builder: (showContext) {
                                 return FutureBuilder(
                                     future: playlistController.updateSongs(
-                                        songs: selectedSongs,
+                                        songs: selectedSongs
+                                            .map((e) => e.id)
+                                            .toList(),
                                         playlist: playlist),
                                     builder: (futureContext,
                                         AsyncSnapshot snapshot) {
@@ -514,11 +515,16 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                                             const Duration(milliseconds: 1500),
                                             () {
                                           Navigator.pop(showContext);
+                                          Navigator.pop(context);
                                         });
                                       });
 
                                       return const CupertinoAlertDialog(
-                                        title: Text('Successfully added.'),
+                                        title: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 28, horizontal: 12),
+                                          child: Text('Successfully added.'),
+                                        ),
                                       );
                                     });
                               });

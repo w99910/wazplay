@@ -18,6 +18,7 @@ import 'package:wazplay/support/utils/control_buttons.dart';
 import 'package:wazplay/support/utils/custom_rect_tween.dart';
 import 'package:wazplay/support/utils/lyrics_api.dart';
 import 'package:wazplay/widgets/custom_image.dart';
+import 'package:wazplay/widgets/preview.dart';
 
 class MusicPlayer extends StatefulWidget {
   final List<Playable> playables;
@@ -47,7 +48,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
     _playables = widget.playables;
     _musicController = Get.find<MusicController>();
     _songController = Get.find<SongController>();
-    _playlistController = Get.find<PlaylistController>();
+    _playlistController = PlaylistController();
     _audioHandler = CustomAudioHandler.instance;
     _audioPlayer = _audioHandler.audioPlayer;
     _currentTrack = widget.currentTrack;
@@ -129,7 +130,9 @@ class _MusicPlayerState extends State<MusicPlayer> {
               PopupMenuItem(
                   onTap: () async {
                     Future.delayed(const Duration(milliseconds: 50), () async {
+                      Playlist? playlist;
                       await showModalBottomSheet(
+                          enableDrag: false,
                           shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(14),
@@ -137,30 +140,119 @@ class _MusicPlayerState extends State<MusicPlayer> {
                           isScrollControlled: true,
                           context: context,
                           builder: (BuildContext context) {
-                            return Container(
-                              height: size.height * 0.6,
-                              width: size.width,
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 16, horizontal: 12),
-                              child: FutureBuilder(
-                                  future: _playlistController.getPlaylists(),
-                                  builder: (_,
-                                      AsyncSnapshot<List<Playlist>> snapshot) {
-                                    if (!snapshot.hasData) {
-                                      return const CircularProgressIndicator
-                                          .adaptive();
-                                    }
-                                    List<Playlist> playlists = snapshot.data!;
-                                    return ListView.separated(
-                                        itemBuilder: (_, int index) {
-                                          return SizedBox();
-                                        },
-                                        separatorBuilder: (_, __) =>
-                                            const SizedBox(height: 12),
-                                        itemCount: playlists.length);
-                                  }),
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const SizedBox(
+                                  height: 24,
+                                ),
+                                const Text(
+                                    'Note: Tap the playlist to add song'),
+                                Container(
+                                  height: size.height * 0.6,
+                                  width: size.width,
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 24, horizontal: 32),
+                                  child: FutureBuilder(
+                                      future:
+                                          _playlistController.getPlaylists(),
+                                      builder: (BuildContext context,
+                                          AsyncSnapshot<List<Playlist>>
+                                              snapshot) {
+                                        if (!snapshot.hasData) {
+                                          return const CircularProgressIndicator
+                                              .adaptive();
+                                        }
+                                        List<Playlist> playlists =
+                                            snapshot.data!;
+                                        return ListView.separated(
+                                            itemBuilder: (_, int index) {
+                                              return ListTile(
+                                                onTap: () {
+                                                  playlist = playlists[index];
+                                                  Navigator.pop(context);
+                                                },
+                                                leading: Container(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    color: Theme.of(context)
+                                                        .primaryColor,
+                                                  ),
+                                                  width: size.width * 0.2,
+                                                  height: size.width * 0.2,
+                                                  child: Icon(
+                                                    Icons.music_note,
+                                                    size: 24,
+                                                    color: Theme.of(context)
+                                                        .primaryColorDark,
+                                                  ),
+                                                ),
+                                                title: Padding(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 8.0),
+                                                  child: Text(
+                                                    playlists[index]
+                                                        .description,
+                                                    style: const TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                              // return GestureDetector(
+                                              //   onTap: () {
+                                              //     playlist = playlists[index];
+                                              //     Navigator.pop(context);
+                                              //   },
+                                              //   child: Preview(
+                                              //       titleStyle: const TextStyle(
+                                              //         fontSize: 20,
+                                              //         fontWeight:
+                                              //             FontWeight.bold,
+                                              //       ),
+                                              //       axis: Axis.horizontal,
+                                              //       width: size.width * 0.8,
+                                              //       fallbackIcon:
+                                              //           Icons.music_note,
+                                              //       previewAble:
+                                              //           playlists[index],
+                                              //       height: size.height * 0.09),
+                                              // );
+                                            },
+                                            separatorBuilder: (_, __) =>
+                                                const SizedBox(height: 24),
+                                            itemCount: playlists.length);
+                                      }),
+                                ),
+                              ],
                             );
                           });
+                      if (playlist != null) {
+                        int? isSuccess = await _playlistController.updateSongs(
+                            songs: [int.parse(_currentTrack.getId())],
+                            playlist: playlist!);
+                        String message = isSuccess != null
+                            ? 'Added to playlist ${playlist!.description}'
+                            : 'Song is already added in playlist';
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          backgroundColor: const Color(0xFFffd166),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                message,
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                            ],
+                          ),
+                        ));
+                      }
                       // bool confirm = false;
                       // await showDialog(
                       //     context: context,
@@ -194,7 +286,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
                     });
                   },
                   child: const ListTile(
-                    leading: Icon(Icons.delete),
+                    leading: Icon(Icons.queue_music),
                     dense: true,
                     title: Text('Add to playlist'),
                   )),

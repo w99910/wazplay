@@ -11,16 +11,22 @@ class Preview extends StatelessWidget {
   final bool showTitle;
   final bool showSubtitle;
   final Widget? actions;
+  final TextStyle? titleStyle;
+  final TextStyle? subtitleStyle;
+  final IconData? fallbackIcon;
   final Axis axis;
   const Preview(
       {Key? key,
       this.previewAble,
       required this.width,
       required this.height,
+      this.titleStyle,
+      this.subtitleStyle,
       this.axis = Axis.vertical,
       this.centerText = false,
       this.showSubtitle = true,
       this.actions,
+      this.fallbackIcon = Icons.image,
       this.showTitle = true})
       : super(key: key);
 
@@ -90,10 +96,11 @@ class Preview extends StatelessWidget {
         previewAble!.getTitle(),
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
-        style: Theme.of(context)
-            .textTheme
-            .headline6!
-            .copyWith(fontWeight: FontWeight.w600),
+        style: titleStyle ??
+            Theme.of(context)
+                .textTheme
+                .headline6!
+                .copyWith(fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -102,7 +109,7 @@ class Preview extends StatelessWidget {
     return Text(
       previewAble!.getSubtitle(),
       overflow: TextOverflow.ellipsis,
-      style: Theme.of(context).textTheme.caption,
+      style: subtitleStyle ?? Theme.of(context).textTheme.caption,
     );
   }
 
@@ -125,7 +132,7 @@ class Preview extends StatelessWidget {
             width: width,
             height: height,
             child: Icon(
-              Icons.image,
+              fallbackIcon,
               size: width * 0.6,
               color: Theme.of(context).primaryColorDark,
             ),
