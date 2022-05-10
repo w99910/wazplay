@@ -219,9 +219,6 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                     .headline1!
                     .copyWith(fontSize: 32, fontWeight: FontWeight.w700),
               ),
-              // const SizedBox(
-              //   height: 20,
-              // ),
               SizedBox(
                 height: 80,
                 width: size.width,
@@ -253,7 +250,12 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                       right: 70,
                       child: IconButton(
                           padding: const EdgeInsets.all(0),
-                          onPressed: () {
+                          onPressed: () async {
+                            await playlistController.updateItem(
+                                id: playlist.id.toString(),
+                                update: {
+                                  'updatedAt': DateTime.now().toIso8601String(),
+                                });
                             musicController.songs.value = songs;
                             if (musicController.isPlaying.value == -1) {
                               musicController.isPlaying.value = 1;
@@ -330,17 +332,24 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                                     SizedBox(
                                       width: size.width * 0.75,
                                       child: GestureDetector(
-                                        onTap: () {
+                                        onTap: () async {
                                           List<Song> currentSongs = [];
                                           currentSongs.addAll(songs);
                                           currentSongs.insert(
                                               0, currentSongs.removeAt(index));
+                                          await playlistController.updateItem(
+                                              id: playlist.id.toString(),
+                                              update: {
+                                                'updatedAt': DateTime.now()
+                                                    .toIso8601String(),
+                                              });
                                           musicController.songs.value =
                                               currentSongs;
                                           if (musicController.isPlaying.value ==
                                               -1) {
                                             musicController.isPlaying.value = 1;
                                           }
+
                                           Navigator.push(
                                               context,
                                               MaterialPageRoute(
@@ -486,8 +495,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                           List<Song> selectedSongs = loadedSongs
                               .where((element) => addedIndexes[element.id]!)
                               .toList();
-                          inspect(selectedSongs);
                           await showDialog(
+                              barrierDismissible: false,
                               context: context,
                               builder: (showContext) {
                                 return FutureBuilder(

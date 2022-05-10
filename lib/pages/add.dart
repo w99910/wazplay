@@ -1,19 +1,23 @@
 import 'dart:developer';
-import 'dart:io';
+import 'dart:io' show File, Platform;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/instance_manager.dart';
 import 'package:wazplay/controllers/music_controller.dart';
 import 'package:wazplay/support/eloquents/song.dart';
 import 'package:wazplay/support/models/song.dart';
 import 'package:wazplay/support/singletons/app.dart';
+import 'package:wazplay/support/utils/dialog.dart';
 import 'package:wazplay/support/utils/download.dart';
+import 'package:wazplay/support/utils/toast.dart';
 import 'package:wazplay/support/utils/video_download.dart';
+import 'package:wazplay/widgets/custom_text_field.dart';
 import 'package:wazplay/widgets/preview.dart';
 import 'package:wazplay/support/extensions/string.dart';
+
+const String howTo =
+    "How To: \n 1: Open youtube app. \n 2: Play something that you want. \n 3: Click 'Share' button and a bottom action box will show up. \n 4: Click 'Copy link'. \n 5: Paste the url in the above text box and hit the 'search' button at the right side. Wait for a few seconds to load and then you can download and play it.";
 
 class AddNewSong extends StatefulWidget {
   const AddNewSong({Key? key}) : super(key: key);
@@ -113,26 +117,9 @@ class _AddNewSongState extends State<AddNewSong>
                             offset: Offset(0, 6),
                             spreadRadius: 0.4)
                       ]),
-                  child: TextField(
-                    style: Theme.of(context).textTheme.headline6!.copyWith(
-                        color: Colors.black, fontWeight: FontWeight.normal),
-                    controller: _textEditingController,
-                    decoration: InputDecoration(
-                      isDense: true,
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey[300]!),
-                          borderRadius: BorderRadius.circular(12)),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey[600]!),
-                          borderRadius: BorderRadius.circular(12)),
-                      hintText: 'Enter youtube url',
-                      hintStyle: Theme.of(context)
-                          .textTheme
-                          .headline6!
-                          .copyWith(
-                              color: Colors.grey[400],
-                              fontWeight: FontWeight.normal),
-                    ),
+                  child: CustomTextField(
+                    textEditingController: _textEditingController,
+                    hintText: 'Enter youtube url',
                   ),
                 ),
                 Container(
@@ -164,22 +151,10 @@ class _AddNewSongState extends State<AddNewSong>
                             setState(() {
                               totalCurrentSongs.remove(newIndex);
                             });
-                            await showCupertinoDialog(
-                              context: context,
-                              barrierDismissible: true,
-                              builder: (context) {
-                                return CupertinoAlertDialog(
-                                  content: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Text(
-                                      e.toString(),
-                                      style:
-                                          Theme.of(context).textTheme.bodyText1,
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
+                            await CustomDialog.showSimpleDialog(context,
+                                text: e.toString(),
+                                textStyle:
+                                    Theme.of(context).textTheme.bodyText1);
                           });
                         }
                         _textEditingController.clear();
@@ -199,15 +174,7 @@ class _AddNewSongState extends State<AddNewSong>
             const SizedBox(height: 24),
             Expanded(
               child: totalCurrentSongs.isEmpty
-                  ? Center(
-                      child: SizedBox(
-                        width: size.width * 0.5,
-                        height: size.height * 0.5,
-                        child: SvgPicture.asset('assets/icons/search.svg',
-                            // color: Colors.red,
-                            semanticsLabel: 'Search'),
-                      ),
-                    )
+                  ? const HowToSection()
                   : ListView.separated(
                       scrollDirection: Axis.vertical,
                       itemBuilder: (BuildContext context, int index) {
@@ -227,60 +194,68 @@ class _AddNewSongState extends State<AddNewSong>
                                 height: size.height * 0.1,
                                 actions: Row(children: [
                                   videoDownloadStreams[currentIndex] != null
-                                      ? StreamBuilder<double>(
-                                          stream: videoDownloadStreams[
-                                                  currentIndex]!
-                                              .stream,
-                                          builder: (BuildContext buildcontext,
-                                              AsyncSnapshot asyncSnapshot) {
-                                            if (!asyncSnapshot.hasData) {
-                                              if (Platform.isAndroid) {
+                                      ? Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8, horizontal: 14),
+                                          child: StreamBuilder<double>(
+                                              stream: videoDownloadStreams[
+                                                      currentIndex]!
+                                                  .stream,
+                                              builder: (BuildContext
+                                                      buildcontext,
+                                                  AsyncSnapshot asyncSnapshot) {
+                                                if (!asyncSnapshot.hasData) {
+                                                  if (Platform.isAndroid) {
+                                                    return Transform.scale(
+                                                      scale: 0.5,
+                                                      child:
+                                                          const CircularProgressIndicator(),
+                                                    );
+                                                  }
+                                                  return const CircularProgressIndicator
+                                                      .adaptive();
+                                                }
+                                                if (asyncSnapshot.hasError) {
+                                                  // inspect(asyncSnapshot.error);
+                                                }
+                                                if (asyncSnapshot
+                                                        .connectionState ==
+                                                    ConnectionState.done) {
+                                                  save(index);
+                                                }
                                                 return Transform.scale(
                                                   scale: 0.5,
                                                   child:
-                                                      const CircularProgressIndicator(),
+                                                      CircularProgressIndicator(
+                                                          value: asyncSnapshot
+                                                              .data),
                                                 );
-                                              }
-                                              return const CircularProgressIndicator
-                                                  .adaptive();
-                                            }
-                                            if (asyncSnapshot.connectionState ==
-                                                ConnectionState.done) {
-                                              save(index);
-                                            }
-                                            return Transform.scale(
-                                              scale: 0.5,
-                                              child: CircularProgressIndicator(
-                                                  value: asyncSnapshot.data),
-                                            );
-                                          })
+                                              }),
+                                        )
                                       : downloadedSongs.contains(index)
                                           ? IconButton(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 8,
+                                                      horizontal: 16),
                                               icon:
                                                   const Icon(Icons.play_arrow),
                                               onPressed: () async {
                                                 if (!File(songs[index]
                                                         .getAudioPath())
                                                     .existsSync()) {
-                                                  await showCupertinoDialog(
-                                                      context: context,
-                                                      barrierDismissible: true,
-                                                      builder: (context) {
-                                                        return CupertinoAlertDialog(
-                                                          content: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(16.0),
-                                                            child: Text(
+                                                  await CustomDialog
+                                                      .showSimpleDialog(context,
+                                                          text:
                                                               'File not found',
-                                                              style: Theme.of(
-                                                                      context)
-                                                                  .textTheme
-                                                                  .bodyText1,
-                                                            ),
-                                                          ),
-                                                        );
-                                                      });
+                                                          textStyle: Theme.of(
+                                                                  context)
+                                                              .textTheme
+                                                              .bodyText1!
+                                                              .copyWith(
+                                                                  color: Colors
+                                                                          .red[
+                                                                      400]));
                                                   return;
                                                 }
                                                 _musicController.songs.value = [
@@ -296,14 +271,26 @@ class _AddNewSongState extends State<AddNewSong>
                                                 }
                                               })
                                           : IconButton(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 8,
+                                                      horizontal: 16),
                                               onPressed: () async {
-                                                inspect(totalCurrentSongs);
-                                                inspect(currentIndex);
                                                 VideoDownloadStream
                                                     videoDownloadStream =
                                                     await VideoDownload
                                                         .getVideoDownloadStream(
                                                             songs[index].path);
+                                                if (File(videoDownloadStream
+                                                        .path)
+                                                    .existsSync()) {
+                                                  File(videoDownloadStream.path)
+                                                      .deleteSync();
+                                                  Toast.showWarningToast(
+                                                      context,
+                                                      'Song is already downloaded');
+                                                  return;
+                                                }
                                                 videoDownloadStream.download();
                                                 setState(() {
                                                   videoDownloadStreams[
@@ -312,21 +299,21 @@ class _AddNewSongState extends State<AddNewSong>
                                                 });
                                               },
                                               icon: const Icon(Icons.download)),
-                                  IconButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          songs.removeAt(index);
-                                          videoDownloadStreams
-                                              .remove(currentIndex);
-                                          totalCurrentSongs
-                                              .remove(currentIndex);
-                                          downloadedSongs.remove(index);
-                                        });
-                                      },
-                                      icon: const Icon(
-                                        Icons.close,
-                                        color: Colors.red,
-                                      ))
+                                  // IconButton(
+                                  //     onPressed: () {
+                                  //       setState(() {
+                                  //         songs.removeAt(index);
+                                  //         videoDownloadStreams
+                                  //             .remove(currentIndex);
+                                  //         totalCurrentSongs
+                                  //             .remove(currentIndex);
+                                  //         downloadedSongs.remove(index);
+                                  //       });
+                                  //     },
+                                  //     icon: const Icon(
+                                  //       Icons.close,
+                                  //       color: Colors.red,
+                                  //     ))
                                 ]),
                               );
                       },
@@ -341,4 +328,41 @@ class _AddNewSongState extends State<AddNewSong>
 
   @override
   bool get wantKeepAlive => true;
+}
+
+class HowToSection extends StatelessWidget {
+  const HowToSection({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    return SingleChildScrollView(
+      child: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    howTo,
+                    style: TextStyle(height: 1.8, letterSpacing: 1.1),
+                  ),
+                )
+              ],
+            ),
+            SizedBox(
+              width: size.width * 0.5,
+              height: size.height * 0.25,
+              child: SvgPicture.asset('assets/icons/search.svg',
+                  // color: Colors.red,
+                  semanticsLabel: 'Search'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

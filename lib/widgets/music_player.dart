@@ -17,6 +17,7 @@ import 'package:wazplay/support/singletons/audio_handler.dart';
 import 'package:wazplay/support/utils/control_buttons.dart';
 import 'package:wazplay/support/utils/custom_rect_tween.dart';
 import 'package:wazplay/support/utils/lyrics_api.dart';
+import 'package:wazplay/support/utils/toast.dart';
 import 'package:wazplay/widgets/custom_image.dart';
 import 'package:wazplay/widgets/preview.dart';
 
@@ -205,25 +206,6 @@ class _MusicPlayerState extends State<MusicPlayer> {
                                                   ),
                                                 ),
                                               );
-                                              // return GestureDetector(
-                                              //   onTap: () {
-                                              //     playlist = playlists[index];
-                                              //     Navigator.pop(context);
-                                              //   },
-                                              //   child: Preview(
-                                              //       titleStyle: const TextStyle(
-                                              //         fontSize: 20,
-                                              //         fontWeight:
-                                              //             FontWeight.bold,
-                                              //       ),
-                                              //       axis: Axis.horizontal,
-                                              //       width: size.width * 0.8,
-                                              //       fallbackIcon:
-                                              //           Icons.music_note,
-                                              //       previewAble:
-                                              //           playlists[index],
-                                              //       height: size.height * 0.09),
-                                              // );
                                             },
                                             separatorBuilder: (_, __) =>
                                                 const SizedBox(height: 24),
@@ -240,18 +222,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
                         String message = isSuccess != null
                             ? 'Added to playlist ${playlist!.description}'
                             : 'Song is already added in playlist';
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          backgroundColor: const Color(0xFFffd166),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                message,
-                                style: const TextStyle(color: Colors.black),
-                              ),
-                            ],
-                          ),
-                        ));
+                        Toast.showWarningToast(context, message);
                       }
                       // bool confirm = false;
                       // await showDialog(
@@ -343,8 +314,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
       ),
       body: Align(
         alignment: Alignment.center,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+        child: SizedBox(
           height: size.height,
           width: size.width * 0.95,
           child: SafeArea(

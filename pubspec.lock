@@ -577,9 +577,15 @@ packages:
   wazeloquent:
     dependency: "direct main"
     description:
+<<<<<<< HEAD
       path: "../packages/wazeloquent"
       relative: true
     source: path
+=======
+      name: wazeloquent
+      url: "https://pub.dartlang.org"
+    source: hosted
+>>>>>>> cea30e647e274abe38503acf985ca4aaacf2862a
     version: "0.0.1+4"
   win32:
     dependency: transitive

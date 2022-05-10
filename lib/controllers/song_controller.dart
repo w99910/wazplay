@@ -60,6 +60,7 @@ class SongController {
       titles.add(res['title'].toString());
     }
 
+    int count = 0;
     for (var title in titles) {
       List<String> split = title.toString().split('-');
       String artist = Artist.extractArtistName(split[0]);
@@ -72,7 +73,12 @@ class SongController {
             bio = details['strBiographyEN'];
           }
         } catch (e) {}
-        artists.add(Artist(name: artist, thumbnail: thumbnail, bio: bio));
+        if (count < 5) {
+          artists.add(Artist(name: artist, thumbnail: thumbnail, bio: bio));
+        }
+        if (keyword == null) {
+          count += 1;
+        }
       }
     }
     return artists;

@@ -4,8 +4,6 @@ import 'package:just_audio_background/just_audio_background.dart'
 import 'package:wazplay/support/eloquents/song.dart';
 import 'package:wazplay/support/interfaces/playable.dart';
 import 'package:wazplay/support/interfaces/previewable.dart';
-import 'package:wazplay/support/singletons/app.dart';
-import 'package:wazplay/support/utils/download.dart';
 
 class Song implements PreviewAble, Playable {
   int id;
@@ -121,6 +119,8 @@ class Song implements PreviewAble, Playable {
     // var path =
     //     'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3';
     bool isOnline = reg.hasMatch(path);
+
+    // String path = Directory(await PathProvider.getPath()).listSync()
     Uri _uri = isOnline ? Uri.parse(path) : Uri.file(path);
     MediaItem mediaItem = MediaItem(
         duration: const Duration(seconds: 180),

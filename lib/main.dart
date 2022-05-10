@@ -31,6 +31,7 @@ Future<void> main() async {
     androidNotificationOngoing: true,
   );
   var _pref = await SharedPreferences.getInstance();
+  // await _pref.clear();
   ThemeMode mode = !_pref.containsKey('isDarkMode')
       ? ThemeMode.system
       : _pref.getBool('isDarkMode')!

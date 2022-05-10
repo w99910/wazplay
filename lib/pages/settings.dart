@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:wazplay/pages/terms_and_conditions.dart';
 import 'package:wazplay/support/singletons/app.dart';
 import 'package:wazplay/support/singletons/configuration.dart';
 
@@ -67,6 +70,8 @@ class _SettingsState extends State<Settings>
                             .copyWith(fontWeight: FontWeight.w500),
                       )),
                       Switch.adaptive(
+                          activeTrackColor: Colors.grey[300],
+                          thumbColor: MaterialStateProperty.all(Colors.white),
                           value: isDarkMode,
                           onChanged: (val) {
                             HapticFeedback.mediumImpact();
@@ -93,6 +98,11 @@ class _SettingsState extends State<Settings>
                             .copyWith(fontWeight: FontWeight.w500),
                       )),
                       Switch.adaptive(
+                          activeTrackColor:
+                              Platform.isAndroid ? Colors.grey[300] : null,
+                          thumbColor: Platform.isAndroid
+                              ? MaterialStateProperty.all(Colors.white)
+                              : null,
                           value: isVibratable,
                           onChanged: (val) {
                             setState(() {
@@ -118,6 +128,11 @@ class _SettingsState extends State<Settings>
                             .copyWith(fontWeight: FontWeight.w500),
                       )),
                       Switch.adaptive(
+                          activeTrackColor:
+                              Platform.isAndroid ? Colors.grey[300] : null,
+                          thumbColor: Platform.isAndroid
+                              ? MaterialStateProperty.all(Colors.white)
+                              : null,
                           value: isAutoDownloadThumbnail,
                           onChanged: (val) {
                             setState(() {
@@ -134,31 +149,47 @@ class _SettingsState extends State<Settings>
                       const SizedBox(
                         width: 16,
                       ),
-                      Expanded(
+                      TextButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                                isScrollControlled: true,
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 20),
+                                    child: TermsAndConditions(),
+                                  );
+                                });
+                          },
                           child: Text(
-                        'Terms and Conditions',
-                        style: Theme.of(context).textTheme.headline6!.copyWith(
-                            fontWeight: FontWeight.w500,
-                            decoration: TextDecoration.underline),
-                      )),
+                            'Terms and Conditions',
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline6!
+                                .copyWith(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.w500,
+                                    decoration: TextDecoration.underline),
+                          )),
                     ],
                   ),
-                  ...buildDivider(20),
-                  Row(
-                    children: [
-                      const Icon(Icons.person),
-                      const SizedBox(
-                        width: 16,
-                      ),
-                      Expanded(
-                          child: Text(
-                        'About Us',
-                        style: Theme.of(context).textTheme.headline6!.copyWith(
-                            fontWeight: FontWeight.w500,
-                            decoration: TextDecoration.underline),
-                      )),
-                    ],
-                  )
+                  // ...buildDivider(20),
+                  // Row(
+                  //   children: [
+                  //     const Icon(Icons.person),
+                  //     const SizedBox(
+                  //       width: 16,
+                  //     ),
+                  //     Expanded(
+                  //         child: Text(
+                  //       'About Us',
+                  //       style: Theme.of(context).textTheme.headline6!.copyWith(
+                  //           fontWeight: FontWeight.w500,
+                  //           decoration: TextDecoration.underline),
+                  //     )),
+                  //   ],
+                  // )
                 ],
               ),
             )

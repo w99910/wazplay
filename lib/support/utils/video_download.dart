@@ -24,6 +24,7 @@ class VideoDownload {
     var manifest = await yt.videos.streamsClient.getManifest(id);
     // var audio = manifest.audioOnly.first;
     // var audioStream = yt.videos.streamsClient.get(audio);
+    // var streams = manifest.audio;
     var streams = manifest.audio;
     var audio = streams.withHighestBitrate();
     var audioStream = yt.videos.streamsClient.get(audio);
@@ -41,8 +42,10 @@ class VideoDownload {
         .replaceAll('|', '');
     var filePath = dir + '/' + fileName;
 
-    print('video download stream');
-
+    var file = File(filePath);
+    if (file.existsSync()) {
+      file.deleteSync();
+    }
     return VideoDownloadStream(
         path: filePath,
         audioStream: audioStream,
@@ -90,20 +93,22 @@ class VideoDownloadStream {
     var output = file.openWrite(mode: FileMode.writeOnlyAppend);
     var size = totalSize;
     var count = 0;
-
-    await for (final data in audioStream) {
-      // Keep track of the current downloaded data.
+    audioStream.listen((data) {
       count += data.length;
-
       // Calculate the current progress.
       output.add(data);
       var progress = ((count / size) * 100).ceil();
       controller.sink.add(progress / 100);
-    }
-    await controller.sink.close();
-    await controller.close();
+    }, onDone: () async {
+      await controller.sink.close();
+      await controller.close();
 
-    output.close();
+      output.close();
+    }, onError: (obj, trace) async {
+      controller.sink.addError(obj);
+      await controller.sink.close();
+      await controller.close();
+    }, cancelOnError: true);
   }
 }
 

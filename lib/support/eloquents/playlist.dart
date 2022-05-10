@@ -73,7 +73,10 @@ class PlaylistEloquent extends Eloquent {
 
   @override
   String get getPrimaryColumn => PlaylistFields.id;
+<<<<<<< HEAD
 
+=======
+>>>>>>> cea30e647e274abe38503acf985ca4aaacf2862a
   @override
   String get tableName => 'playlists';
 

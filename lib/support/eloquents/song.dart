@@ -1,4 +1,3 @@
-import 'package:sqflite_common/sqlite_api.dart';
 import 'package:wazeloquent/wazeloquent.dart';
 import 'package:wazplay/support/models/song.dart';
 

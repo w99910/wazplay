@@ -1,11 +1,18 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart'
+    show showCupertinoDialog, CupertinoAlertDialog;
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wazplay/controllers/music_controller.dart';
-import 'package:wazplay/pages/add_new.dart';
+import 'package:wazplay/pages/add.dart';
 import 'package:wazplay/pages/home.dart';
 import 'package:wazplay/pages/library.dart';
 import 'package:wazplay/pages/settings.dart';
+import 'package:wazplay/pages/terms_and_conditions.dart';
 import 'package:wazplay/support/singletons/app.dart';
 import 'package:wazplay/widgets/logo.dart';
 import 'package:wazplay/support/singletons/configuration.dart';
@@ -35,6 +42,7 @@ class _IndexState extends State<Index> {
   void initState() {
     _musicController = App.instance.musicController;
     _pageController = PageController();
+    init();
     super.initState();
     App.instance.routeController.currentTabIndex.listen((index) {
       setState(() {
@@ -43,6 +51,64 @@ class _IndexState extends State<Index> {
       _pageController.animateToPage(index,
           duration: const Duration(milliseconds: 100), curve: Curves.easeOut);
     });
+  }
+
+  init() async {
+    SharedPreferences _pref = await SharedPreferences.getInstance();
+    if (_pref.getBool('acceptedTermsAndConditions') == null) {
+      await showCupertinoDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: RichText(
+                  text: TextSpan(
+                    style: TextStyle(height: 1.5),
+                    children: <TextSpan>[
+                      const TextSpan(
+                          text: 'Before using app, you must agree to this '),
+                      TextSpan(
+                          style: const TextStyle(
+                            color: Colors.blue,
+                          ),
+                          text: 'Terms And Conditions',
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              showModalBottomSheet(
+                                  isScrollControlled: true,
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 20),
+                                      child: TermsAndConditions(),
+                                    );
+                                  });
+                            }),
+                    ],
+                  ),
+                )),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    _pref.setBool('acceptedTermsAndConditions', true);
+                    Navigator.pop(context);
+                  },
+                  child: Text('Yes, I agree to those.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.green[400]))),
+              TextButton(
+                  onPressed: () {
+                    exit(0);
+                  },
+                  child: Text('No', style: TextStyle(color: Colors.red[400]))),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override

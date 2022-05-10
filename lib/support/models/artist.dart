@@ -36,6 +36,18 @@ class Artist implements PreviewAble {
     return '';
   }
 
+  static extractArtistName(String string) {
+    String artist = string;
+    if (artist.contains('-')) {
+      artist = artist.split('-')[0];
+    }
+
+    artist = artist
+        .splitMapJoin(RegExp(r'([^a-zA-Z\s].*)'), onMatch: (match) => '')
+        .trim();
+    return artist;
+  }
+
   @override
   String getTitle() {
     return name;

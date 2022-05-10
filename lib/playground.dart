@@ -1,18 +1,17 @@
 // import 'dart:';
 void main() {
-  // A a = A();
+  A a = A();
   // a.add(Future.delayed(const Duration(seconds: 2), () {
   //   return (val) {
   //     val += 1;
   //     print(val);
   //   };
   // }));
-  // a.init();
-  List<Map> test = [
-    {'sdf': '12345'},
-    {'sdf': '33'}
-  ];
-  print(test.asMap().values.where((element) => element['sdf'] == '33').isEmpty);
+  var string =
+      '/var/mobile/Containers/Data/Application/FBBF1143-5B91-4DC3-987A-25F6668D0E26/Documents/files/Justin Bieber - Ghost.webm';
+  print(Uri.file(string));
+  // String s = 'sdf sdf 6% 4421 sdf ;;';
+  // print(s.splitMapJoin(RegExp(r'([^a-zA-Z\s].*)'), onMatch: (match) => ''));
 }
 
 sdf() {
@@ -30,6 +29,6 @@ class A {
     for (var function in inserts) {
       Function.apply(await function, [i]);
     }
-    print(i);
+    print(runtimeType);
   }
 }
