@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:wazeloquent/wazeloquent.dart';
 import 'package:wazplay/support/eloquents/song.dart';
 import 'package:wazplay/support/interfaces/playable.dart';
 import 'package:wazplay/support/models/artist.dart';
@@ -16,13 +17,15 @@ class SongController {
       bool? distinct,
       bool descending = false,
       int? offset}) async {
-    var data = await songEloquent.all(
-        limit: limit,
-        orderBy: orderBy,
-        distinct: distinct,
-        descending: descending,
-        offset: offset);
-    return fromDB(data);
+    var el = songEloquent
+        .orderBy(orderBy, sort: descending ? Sort.descending : Sort.ascending)
+        .skip(offset)
+        .take(limit);
+    if (distinct != null && distinct) {
+      el = el.distinct([]);
+    }
+    var data = await el.get();
+    return fromDB(data!);
   }
 
   Future<List<Song>> fromDB(List<Map<String, Object?>> rows) async {
@@ -36,38 +39,30 @@ class SongController {
   Future<List<Song>> search(
       {String? keyword, int? offset, int limit = 10}) async {
     if (keyword == null) return all(limit: limit, offset: offset);
-    var data = await songEloquent.searchByKeyWord(keyword,
-        searchableColumns: ['title', 'author', 'description']);
+    var data = await songEloquent
+        .search(keyword, searchableColumns: ['title', 'author']);
     return fromDB(data);
   }
 
   Future updateItem(
       {required String id, required Map<String, Object?> update}) async {
-    return songEloquent.update(id, update);
+    return songEloquent.where('id', id.toString()).update(update);
   }
 
   Future<List<Artist>> getArtists({String? keyword}) async {
     List<Artist> artists = [];
     List<String> titles = [];
     var response = keyword != null
-        ? await songEloquent
-            .searchByKeyWord(keyword, searchableColumns: ['title'])
-        : await songEloquent.select(columns: ['title']);
+        ? await songEloquent.search(keyword, searchableColumns: ['title'])
+        : await songEloquent.select(['title']).get();
 
-    for (var res in response) {
+    for (var res in response!) {
       titles.add(res['title'].toString());
     }
 
     for (var title in titles) {
       List<String> split = title.toString().split('-');
-      String artist = split[0];
-      if (split[0].contains(',')) {
-        artist = split[0].split(',')[0];
-      }
-      if (split[0].contains('&')) {
-        artist = split[0].split('&')[0];
-      }
-      artist = artist.trim();
+      String artist = Artist.extractArtistName(split[0]);
       if (artists.where((val) => val.name == artist).isEmpty) {
         String? thumbnail, bio;
         try {
@@ -86,8 +81,8 @@ class SongController {
 
   Future<List<Song>> getSongsByArtist(Artist artist) async {
     List<Song> songs = [];
-    var response = await songEloquent
-        .searchByKeyWord(artist.name, searchableColumns: ['title']);
+    var response =
+        await songEloquent.search(artist.name, searchableColumns: ['title']);
     for (var row in response) {
       songs.add(Song.fromDB(row));
     }

@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:wazeloquent/wazeloquent.dart';
 import 'package:wazplay/support/eloquents/playlist.dart';
 import 'package:wazplay/support/models/playlist.dart';
 import 'package:wazplay/support/models/song.dart';
@@ -16,8 +17,8 @@ class PlaylistController {
     if (i < 0) {
       return null;
     }
-    var data = await playlistEloquent.where({'id': i});
-    if (data.isEmpty) {
+    var data = await playlistEloquent.where('id', i.toString()).get();
+    if (data == null || data.isEmpty) {
       return null;
     }
     return Playlist.fromDB(data.first);
@@ -26,6 +27,11 @@ class PlaylistController {
   Future<int?> deleteSongs(
       {required List<Song> songs, required Playlist playlist}) async {
     return await playlistEloquent.deleteSongs(songs: songs, playlist: playlist);
+  }
+
+  Future updateItem(
+      {required String id, required Map<String, Object?> update}) async {
+    return playlistEloquent.where('id', id.toString()).update(update);
   }
 
   Future<int?> updateSongs(
@@ -42,6 +48,40 @@ class PlaylistController {
       }
     }
     return songs;
+  }
+
+  Future<List<Playlist>> all(
+      {int? limit,
+      String? orderBy,
+      String? groupBy,
+      bool? distinct,
+      bool descending = false,
+      int? offset}) async {
+    var el = await playlistEloquent
+        .orderBy(orderBy, sort: descending ? Sort.descending : Sort.ascending)
+        .skip(offset)
+        .take(limit);
+    if (distinct != null && distinct) {
+      el = el.distinct([]);
+    }
+    var data = await el.get();
+    return fromDB(data!);
+  }
+
+  List<Playlist> fromDB(List<Map<String, Object?>> rows) {
+    List<Playlist> playlists = [];
+    for (var playlist in rows) {
+      playlists.add(Playlist.fromDB(playlist));
+    }
+    return playlists;
+  }
+
+  Future<List<Playlist>> search(
+      {String? keyword, int? offset, int limit = 10}) async {
+    if (keyword == null) return all(limit: limit, offset: offset);
+    var data = await playlistEloquent
+        .search(keyword, searchableColumns: ['description']);
+    return fromDB(data);
   }
 
   Future<List<Playlist>> getPlaylists() async {
