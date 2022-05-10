@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,6 +32,12 @@ Future<void> main() async {
     androidNotificationOngoing: true,
   );
   var _pref = await SharedPreferences.getInstance();
+
+  WidgetsFlutterBinding.ensureInitialized();
+  await FlutterDownloader.initialize(
+      debug: false // optional: set false to disable printing logs to console
+      );
+  // await _pref.clear();
   ThemeMode mode = !_pref.containsKey('isDarkMode')
       ? ThemeMode.system
       : _pref.getBool('isDarkMode')!

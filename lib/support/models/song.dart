@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart'
     show MediaItem;
@@ -98,8 +100,13 @@ class Song implements PreviewAble, Playable {
   }
 
   Future<void> reload() async {
-    var song = Song.fromDB(
-        (await SongEloquent().where({'title': title, 'author': author})).first);
+    // var song = Song.fromDB(
+    //     (await SongEloquent().where({'title': title, 'author': author})).first);
+    var song = Song.fromDB((await SongEloquent()
+            .where('title', title)
+            .where('author', author)
+            .get())!
+        .first);
     id = song.id;
     thumbnail = thumbnail;
     description = description;
@@ -118,6 +125,11 @@ class Song implements PreviewAble, Playable {
     // var path =
     //     'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3';
     bool isOnline = reg.hasMatch(path);
+
+    // String path = Directory(await PathProvider.getPath()).listSync()
+    if (!File(path).existsSync()) {
+      print('file not found');
+    }
     Uri _uri = isOnline ? Uri.parse(path) : Uri.file(path);
     MediaItem mediaItem = MediaItem(
         duration: const Duration(seconds: 180),

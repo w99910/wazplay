@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,8 @@ import 'package:wazplay/support/models/playlist.dart';
 import 'package:wazplay/support/models/song.dart';
 import 'package:wazplay/support/singletons/app.dart';
 import 'package:wazplay/support/utils/greeting.dart';
+import 'package:wazplay/support/utils/path.dart';
+import 'package:wazplay/widgets/add_playlist.dart';
 import 'package:wazplay/widgets/info_box.dart';
 import 'package:wazplay/widgets/preview.dart';
 
@@ -21,7 +24,7 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   List<Song> recentlyAdded = [];
   List<Song> recentlyPlayed = [];
   List<Playlist> recentlyPlaylists = [];
@@ -43,6 +46,13 @@ class _HomeState extends State<Home> {
   }
 
   load() async {
+    print(await PathProvider.getPath());
+    // Directory(await PathProvider.getPath()).deleteSync(recursive: true);
+    for (var i in Directory(await PathProvider.getPath()).listSync()) {
+      // i.deleteSync();
+      print(i.uri.path);
+      print(File(i.uri.path).existsSync());
+    }
     recentlyAdded = [];
     recentlyPlayed = [];
     recentlyPlaylists = [];
@@ -51,12 +61,15 @@ class _HomeState extends State<Home> {
         orderBy: 'createdAt', descending: true, limit: 5));
     recentlyPlayed.addAll(await songController.all(
         orderBy: 'updatedAt', descending: true, limit: 5));
-    recentlyPlaylists.addAll(await playlistController.getPlaylists());
+    recentlyPlaylists.addAll(await playlistController.all(
+        orderBy: 'updatedAt', descending: true, limit: 5));
     setState(() {
       recentlyAdded = recentlyAdded;
       recentlyPlayed = recentlyPlayed;
       loading = false;
     });
+
+    // print(File(recentlyAdded.first.path).existsSync());
   }
 
   @override
@@ -66,6 +79,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     Size size = MediaQuery.of(context).size;
     return loading
         ? const Center(child: CircularProgressIndicator.adaptive())
@@ -94,7 +108,7 @@ class _HomeState extends State<Home> {
                   recentlyPlayed.isNotEmpty
                       ? SizedBox(
                           width: size.width,
-                          height: size.height * 0.22,
+                          height: size.height * 0.24,
                           child: ListView.separated(
                               scrollDirection: Axis.horizontal,
                               itemBuilder:
@@ -145,7 +159,7 @@ class _HomeState extends State<Home> {
                   recentlyAdded.isNotEmpty
                       ? SizedBox(
                           width: size.width,
-                          height: size.height * 0.22,
+                          height: size.height * 0.24,
                           child: ListView.separated(
                               scrollDirection: Axis.horizontal,
                               itemBuilder:
@@ -217,10 +231,13 @@ class _HomeState extends State<Home> {
                                 width: size.width * 0.35,
                                 height: size.height * 0.3,
                                 previewAble: recentlyPlaylists[index],
+                                fallbackIcon: Icons.music_note,
                               ),
                             );
                           }
-                          return buildAddPlaylistWidget(context,
+                          return AddPlaylist(
+                              playlistController: playlistController,
+                              musicController: musicController,
                               width: recentlyPlaylists.isEmpty
                                   ? null
                                   : size.width * 0.35,
@@ -241,76 +258,6 @@ class _HomeState extends State<Home> {
             ));
   }
 
-  Widget buildAddPlaylistWidget(BuildContext context,
-      {double? width, double? height, Alignment? alignment}) {
-    Size size = MediaQuery.of(context).size;
-    return Align(
-      alignment: alignment ?? Alignment.center,
-      child: InfoBox(
-          onPressed: () async {
-            String? description;
-            await showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return CupertinoAlertDialog(
-                      title: const Text('Create new playlist.'),
-                      content: Material(
-                        color: Colors.transparent,
-                        elevation: 0,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 14, bottom: 8),
-                          child: TextField(
-                            onChanged: (value) => description = value,
-                            decoration: InputDecoration(
-                              isDense: true,
-                              hintText: 'Name your playlist',
-                              hintStyle: Theme.of(context)
-                                  .textTheme
-                                  .headline6!
-                                  .copyWith(
-                                      color: Colors.grey[400],
-                                      fontWeight: FontWeight.normal),
-                            ),
-                          ),
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text('Create',
-                                style: TextStyle(color: Colors.green[400]))),
-                        TextButton(
-                            onPressed: () {
-                              description = null;
-                              Navigator.pop(context);
-                            },
-                            child: Text(
-                              'Cancel',
-                              style: TextStyle(color: Colors.red[400]),
-                            ))
-                      ]);
-                });
-            if (description != null) {
-              Playlist? playlist =
-                  await playlistController.create(description: description!);
-              if (playlist != null) {
-                musicController.reload();
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            PlaylistWidget(playlist: playlist)));
-              }
-            }
-          },
-          width: width ?? size.width * 0.9,
-          height: height ?? size.height * 0.22,
-          bgColor: Theme.of(context).cardColor,
-          padding: const EdgeInsets.all(8),
-          textAlign: TextAlign.center,
-          message: 'Create New Playlist +'),
-    );
-  }
+  @override
+  bool get wantKeepAlive => true;
 }

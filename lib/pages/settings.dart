@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -67,6 +69,8 @@ class _SettingsState extends State<Settings>
                             .copyWith(fontWeight: FontWeight.w500),
                       )),
                       Switch.adaptive(
+                          activeTrackColor: Colors.grey[300],
+                          thumbColor: MaterialStateProperty.all(Colors.white),
                           value: isDarkMode,
                           onChanged: (val) {
                             HapticFeedback.mediumImpact();
@@ -93,6 +97,11 @@ class _SettingsState extends State<Settings>
                             .copyWith(fontWeight: FontWeight.w500),
                       )),
                       Switch.adaptive(
+                          activeTrackColor:
+                              Platform.isAndroid ? Colors.grey[300] : null,
+                          thumbColor: Platform.isAndroid
+                              ? MaterialStateProperty.all(Colors.white)
+                              : null,
                           value: isVibratable,
                           onChanged: (val) {
                             setState(() {
@@ -118,6 +127,11 @@ class _SettingsState extends State<Settings>
                             .copyWith(fontWeight: FontWeight.w500),
                       )),
                       Switch.adaptive(
+                          activeTrackColor:
+                              Platform.isAndroid ? Colors.grey[300] : null,
+                          thumbColor: Platform.isAndroid
+                              ? MaterialStateProperty.all(Colors.white)
+                              : null,
                           value: isAutoDownloadThumbnail,
                           onChanged: (val) {
                             setState(() {

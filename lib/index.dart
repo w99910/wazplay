@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:wazplay/controllers/music_controller.dart';
-import 'package:wazplay/pages/add_new.dart';
+import 'package:wazplay/pages/add.dart';
 import 'package:wazplay/pages/home.dart';
 import 'package:wazplay/pages/library.dart';
 import 'package:wazplay/pages/settings.dart';

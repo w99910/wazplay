@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:wazplay/support/models/artist.dart';
 
 class LyricApi {
   static const String baseUrl = 'https://api.lyrics.ovh/v1';
@@ -17,13 +18,7 @@ class LyricApi {
 
   static Map<Lyric, String> getArtistAndTrack(String title) {
     List<String> split = title.split('-');
-    String artist = split[0];
-    if (split[0].contains(',')) {
-      artist = split[0].split(',')[0];
-    }
-    if (split[0].contains('&')) {
-      artist = split[0].split('&')[0];
-    }
+    String artist = Artist.extractArtistName(split[0]);
     String track = split[1]
         .replaceAllMapped(RegExp(r'[\(].*'), (match) => '')
         .replaceAllMapped(RegExp(r'[\[]].*'), (match) => '')

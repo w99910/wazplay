@@ -60,7 +60,6 @@ class _ArtistPageState extends State<ArtistPage> {
 
   @override
   void setState(VoidCallback fn) {
-    // TODO: implement setState
     if (mounted) super.setState(fn);
   }
 
@@ -156,7 +155,6 @@ class _ArtistPageState extends State<ArtistPage> {
                     ),
                   SliverList(
                       delegate: SliverChildBuilderDelegate((context, index) {
-                    print('index - $index / length - ${songs.length}');
                     return Padding(
                         padding: EdgeInsets.only(
                             left: 12,
@@ -189,26 +187,6 @@ class _ArtistPageState extends State<ArtistPage> {
                               height: size.height * 0.1),
                         ));
                   }, childCount: songs.length)),
-                  // SliverToBoxAdapter(
-                  //   child: SafeArea(
-                  //     child: Container(
-                  //       padding: const EdgeInsets.symmetric(horizontal: 16),
-                  //       height: size.height,
-                  //       width: 20,
-                  //       child: ListView.separated(
-                  //           controller: _itemsScrollController,
-                  //           separatorBuilder: (context, index) {
-                  //             return const SizedBox(
-                  //               height: 10,
-                  //             );
-                  //           },
-                  //           itemCount: 20,
-                  //           itemBuilder: (BuildContext context, index) {
-                  //             return CustomPlaceholder(width: 20, height: 50);
-                  //           }),
-                  //     ),
-                  //   ),
-                  // ),
                 ],
               ),
             ),

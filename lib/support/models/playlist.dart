@@ -28,7 +28,7 @@ class Playlist implements PreviewAble {
 
   static Future<Playlist> temp(String description) async {
     var playlistEloquent = PlaylistEloquent();
-    var latestPlaylist = await playlistEloquent.latest();
+    var latestPlaylist = (await playlistEloquent.latest().get())?.first;
     int tempId = 1;
     if (latestPlaylist != null) {
       tempId = int.parse(latestPlaylist['id'].toString());

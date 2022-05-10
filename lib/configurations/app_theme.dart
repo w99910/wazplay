@@ -23,6 +23,9 @@ class AppTheme {
       // cardColor: const Color.fromARGB(255, 6, 6, 6),
       cardColor: Colors.grey[100],
       scaffoldBackgroundColor: Colors.white,
+      switchTheme: SwitchThemeData(
+        thumbColor: MaterialStateProperty.all(Colors.white),
+      ),
       checkboxTheme: CheckboxThemeData(
           checkColor: MaterialStateProperty.all(Colors.white),
           fillColor: MaterialStateProperty.all(Colors.black)),
@@ -83,6 +86,9 @@ class AppTheme {
       fontFamily: 'Poppins',
       primaryColor: Colors.white,
       brightness: Brightness.dark,
+      switchTheme: SwitchThemeData(
+        thumbColor: MaterialStateProperty.all(Colors.black),
+      ),
       dialogTheme:
           const DialogTheme(backgroundColor: Color.fromARGB(255, 14, 9, 27)),
       bottomSheetTheme: const BottomSheetThemeData(

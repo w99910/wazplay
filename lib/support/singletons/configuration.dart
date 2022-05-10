@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,8 +17,7 @@ class Configuration {
 
   init() async {
     sharedPreferences = await SharedPreferences.getInstance();
-    isDarkMode = sharedPreferences.getBool('isDarkMode') ??
-        ThemeMode.system == ThemeMode.dark;
+    isDarkMode = sharedPreferences.getBool('isDarkMode') ?? Get.isDarkMode;
     vibrateable = sharedPreferences.getBool('vibrateable') ?? true;
 
     autoDownloadThumb = sharedPreferences.getBool('autoDownloadThumb') ?? true;

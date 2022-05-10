@@ -5,7 +5,7 @@ import 'package:wazeloquent/wazeloquent.dart';
 import 'package:wazplay/support/models/playlist.dart';
 import 'package:wazplay/support/models/song.dart';
 
-class PlaylistEloquent extends BaseEloquent {
+class PlaylistEloquent extends Eloquent {
   @override
   List<String> get columns => [
         PlaylistFields.id,
@@ -72,35 +72,32 @@ class PlaylistEloquent extends BaseEloquent {
   }
 
   @override
-  String getPrimaryColumn() {
-    return PlaylistFields.id;
-  }
-
+  String get getPrimaryColumn => PlaylistFields.id;
   @override
   String get tableName => 'playlists';
 
   static Future<Function(Database db, int version)> onCreate = Future(() {
     return (Database db, int version) async {
       await DB.createTable(db, tableName: 'playlists', columns: {
-        PlaylistFields.id: DB.idType,
-        PlaylistFields.description: DB.stringType,
-        PlaylistFields.createdAt: DB.stringType,
-        PlaylistFields.updatedAt: DB.stringType,
+        PlaylistFields.id: ColumnType.idType,
+        PlaylistFields.description: ColumnType.stringType,
+        PlaylistFields.createdAt: ColumnType.stringType,
+        PlaylistFields.updatedAt: ColumnType.stringType,
       });
 
       await DB.createTable(db, tableName: 'playlist_songs', columns: {
-        'id': DB.idType,
+        'id': ColumnType.idType,
         'playlistId': () => DB.foreign(
             foreignKey: 'playlistId',
             parentKey: PlaylistFields.id,
             parentTable: 'playlists',
-            type: DB.integerType,
+            type: ColumnType.integerType,
             onDelete: DBActions.cascade),
         'songId': () => DB.foreign(
             foreignKey: 'songId',
             parentKey: SongFields.id,
             parentTable: 'songs',
-            type: DB.integerType,
+            type: ColumnType.integerType,
             onDelete: DBActions.cascade),
       });
     };
@@ -109,24 +106,24 @@ class PlaylistEloquent extends BaseEloquent {
   static Future<Function(Database db)> onOpen = Future(() {
     return (Database db) async {
       await DB.createTable(db, tableName: 'playlists', columns: {
-        PlaylistFields.id: DB.idType,
-        PlaylistFields.description: DB.stringType,
-        PlaylistFields.createdAt: DB.stringType,
-        PlaylistFields.updatedAt: DB.stringType,
+        PlaylistFields.id: ColumnType.idType,
+        PlaylistFields.description: ColumnType.stringType,
+        PlaylistFields.createdAt: ColumnType.stringType,
+        PlaylistFields.updatedAt: ColumnType.stringType,
       });
       await DB.createTable(db, tableName: 'playlist_songs', columns: {
-        'id': DB.idType,
+        'id': ColumnType.idType,
         'playlistId': () => DB.foreign(
             foreignKey: 'playlistId',
             parentKey: PlaylistFields.id,
             parentTable: 'playlists',
-            type: DB.integerType,
+            type: ColumnType.integerType,
             onDelete: DBActions.cascade),
         'songId': () => DB.foreign(
             foreignKey: 'songId',
             parentKey: SongFields.id,
             parentTable: 'songs',
-            type: DB.integerType,
+            type: ColumnType.integerType,
             onDelete: DBActions.cascade),
       });
     };

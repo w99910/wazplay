@@ -139,6 +139,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.3.0"
+  flutter_downloader:
+    dependency: "direct main"
+    description:
+      name: flutter_downloader
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.7.3"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -580,7 +587,7 @@ packages:
       path: "../packages/wazeloquent"
       relative: true
     source: path
-    version: "0.0.1"
+    version: "0.0.1+1"
   win32:
     dependency: transitive
     description:
