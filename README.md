@@ -25,7 +25,7 @@ WazPlay is the first product for **Waz** and so I decided to make it open-source
   <img 
     width="200"
     height="400"
-    src="HOME.PNG"
+    src="Home.PNG"
   >
     <img 
     width="200"
@@ -45,7 +45,7 @@ WazPlay is the first product for **Waz** and so I decided to make it open-source
      <img 
     width="200"
     height="400"
-    src="PLayer.PNG"
+    src="Player.PNG"
   >
        <img 
     width="200"
