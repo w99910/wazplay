@@ -580,7 +580,7 @@ packages:
       path: "../packages/wazeloquent"
       relative: true
     source: path
-    version: "0.0.1+3"
+    version: "0.0.1+4"
   win32:
     dependency: transitive
     description:
