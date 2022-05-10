@@ -54,6 +54,8 @@ WazPlay is the first product for **Waz** and so I decided to make it open-source
   >
 </p>
 
+**I haven't reformat the code yet. So you can do it yourself.**
+
 If you thanks me, I am just grateful that I help you in some ways.
 
 If you are interested in making flutter mobile apps or Laravel web apps, please contact [this email](hello.waz99@gmail.com).

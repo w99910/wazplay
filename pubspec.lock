@@ -577,10 +577,10 @@ packages:
   wazeloquent:
     dependency: "direct main"
     description:
-      path: "../packages/wazeloquent"
-      relative: true
-    source: path
-    version: "0.0.1+3"
+      name: wazeloquent
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.1+4"
   win32:
     dependency: transitive
     description:

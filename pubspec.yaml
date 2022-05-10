@@ -41,13 +41,12 @@ dependencies:
   just_audio_background: ^0.0.1-beta.5
   get: ^4.6.1
   flutter_svg: ^1.0.3
-  wazeloquent:
-    path: ../packages/wazeloquent/
   sqflite: ^2.0.2+1
   path: ^1.8.0
   rxdart: ^0.27.3
   http: ^0.13.4
   shared_preferences: ^2.0.13
+  wazeloquent: ^0.0.1+4
 
 dev_dependencies:
   flutter_test:
