@@ -98,8 +98,11 @@ class Song implements PreviewAble, Playable {
   }
 
   Future<void> reload() async {
-    var song = Song.fromDB(
-        (await SongEloquent().where({'title': title, 'author': author})).first);
+    var song = Song.fromDB((await SongEloquent()
+            .where('title', title)
+            .where('author', author)
+            .get())!
+        .first);
     id = song.id;
     thumbnail = thumbnail;
     description = description;
