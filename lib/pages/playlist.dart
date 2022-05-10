@@ -495,8 +495,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                           List<Song> selectedSongs = loadedSongs
                               .where((element) => addedIndexes[element.id]!)
                               .toList();
-                          inspect(selectedSongs);
                           await showDialog(
+                              barrierDismissible: false,
                               context: context,
                               builder: (showContext) {
                                 return FutureBuilder(

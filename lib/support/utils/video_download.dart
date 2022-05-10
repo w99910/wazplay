@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:wazplay/support/utils/path.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
@@ -26,7 +25,8 @@ class VideoDownload {
     // var audio = manifest.audioOnly.first;
     // var audioStream = yt.videos.streamsClient.get(audio);
     // var streams = manifest.audio;
-    var audio = manifest.audioOnly.withHighestBitrate();
+    var streams = manifest.audio;
+    var audio = streams.withHighestBitrate();
     var audioStream = yt.videos.streamsClient.get(audio);
 
     var dir = await PathProvider.getPath();
@@ -46,17 +46,9 @@ class VideoDownload {
     if (file.existsSync()) {
       file.deleteSync();
     }
-
-    // inspect(audio);
-    // inspect(audio.url.toString());
-    // inspect(audioStream);
-
     return VideoDownloadStream(
-        filename: fileName,
-        dir: dir,
-        baseUrl: audio.url.toString(),
         path: filePath,
-        // audioStream: audioStream,
+        audioStream: audioStream,
         totalSize: audio.size.totalBytes);
   }
 
@@ -82,57 +74,42 @@ class VideoDownload {
 
 class VideoDownloadStream {
   String path;
-  String dir;
-  String filename;
-  // Stream<List<int>> audioStream;
+  Stream<List<int>> audioStream;
   int totalSize;
-  String baseUrl;
   final StreamController<double> controller = StreamController<double>();
 
-  // Stream<double> get stream => controller.stream;
+  Stream<double> get stream => controller.stream;
 
   VideoDownloadStream(
-      {required this.baseUrl,
-      required this.filename,
-      required this.dir,
-      required this.path,
-      // required this.audioStream,
-      required this.totalSize});
+      {required this.path, required this.audioStream, required this.totalSize});
 
-  // Future download() async {
-  //   var file = File(path);
+  Future download() async {
+    var file = File(path);
 
-  //   // // Delete the file if exists.
-  //   if (file.existsSync()) {
-  //     file.deleteSync();
-  //   }
-  //   var output = file.openWrite(mode: FileMode.writeOnlyAppend);
-  //   var size = totalSize;
-  //   var count = 0;
+    // // Delete the file if exists.
+    if (file.existsSync()) {
+      file.deleteSync();
+    }
+    var output = file.openWrite(mode: FileMode.writeOnlyAppend);
+    var size = totalSize;
+    var count = 0;
+    audioStream.listen((data) {
+      count += data.length;
+      // Calculate the current progress.
+      output.add(data);
+      var progress = ((count / size) * 100).ceil();
+      controller.sink.add(progress / 100);
+    }, onDone: () async {
+      await controller.sink.close();
+      await controller.close();
 
-  //   audioStream.listen((data) {
-  //     count += data.length;
-
-  //     // Calculate the current progress.
-  //     output.add(data);
-  //     var progress = ((count / size) * 100).ceil();
-  //     controller.sink.add(progress / 100);
-  //   }, onDone: () async {
-  //     await controller.sink.close();
-  //     await controller.close();
-
-  //     output.close();
-  //   }, onError: (obj, trace) {
-  //     inspect(obj);
-  //     inspect(trace);
-  //     controller.sink.addError(obj);
-  //   }, cancelOnError: true);
-
-  // await for (final data in audioStream) {
-  //   // Keep track of the current downloaded data.
-
-  // }
-  // }
+      output.close();
+    }, onError: (obj, trace) async {
+      controller.sink.addError(obj);
+      await controller.sink.close();
+      await controller.close();
+    }, cancelOnError: true);
+  }
 }
 
 class DownloadItem {}

@@ -1,13 +1,9 @@
-import 'dart:io';
-
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart'
     show MediaItem;
 import 'package:wazplay/support/eloquents/song.dart';
 import 'package:wazplay/support/interfaces/playable.dart';
 import 'package:wazplay/support/interfaces/previewable.dart';
-import 'package:wazplay/support/singletons/app.dart';
-import 'package:wazplay/support/utils/download.dart';
 
 class Song implements PreviewAble, Playable {
   int id;
@@ -127,9 +123,6 @@ class Song implements PreviewAble, Playable {
     bool isOnline = reg.hasMatch(path);
 
     // String path = Directory(await PathProvider.getPath()).listSync()
-    if (!File(path).existsSync()) {
-      print('file not found');
-    }
     Uri _uri = isOnline ? Uri.parse(path) : Uri.file(path);
     MediaItem mediaItem = MediaItem(
         duration: const Duration(seconds: 180),

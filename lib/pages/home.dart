@@ -46,13 +46,6 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   }
 
   load() async {
-    print(await PathProvider.getPath());
-    // Directory(await PathProvider.getPath()).deleteSync(recursive: true);
-    for (var i in Directory(await PathProvider.getPath()).listSync()) {
-      // i.deleteSync();
-      print(i.uri.path);
-      print(File(i.uri.path).existsSync());
-    }
     recentlyAdded = [];
     recentlyPlayed = [];
     recentlyPlaylists = [];
@@ -68,8 +61,6 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
       recentlyPlayed = recentlyPlayed;
       loading = false;
     });
-
-    // print(File(recentlyAdded.first.path).existsSync());
   }
 
   @override

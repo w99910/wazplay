@@ -2,10 +2,12 @@ import 'package:flutter/cupertino.dart';
 
 class CustomDialog {
   static Future showSimpleDialog(BuildContext context,
-      {required String text, TextStyle? textStyle}) async {
+      {required String text,
+      TextStyle? textStyle,
+      bool? barrierDismissible}) async {
     showCupertinoDialog(
       context: context,
-      barrierDismissible: true,
+      barrierDismissible: barrierDismissible ?? true,
       builder: (context) {
         return CupertinoAlertDialog(
           content: Padding(

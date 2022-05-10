@@ -97,7 +97,7 @@ class _MusicPlayerPreviewState extends State<MusicPlayerPreview>
     await _audioHandler
         .setAudioSession(const AudioSessionConfiguration.music());
     _audioPlayer.play();
-    _audioPlayer.sequenceStateStream.listen((event) {
+    _audioPlayer.sequenceStateStream.listen((event) async {
       if (event != null) {
         if (mounted) {
           MediaItem mediaItem = event.currentSource!.tag;
@@ -106,7 +106,7 @@ class _MusicPlayerPreviewState extends State<MusicPlayerPreview>
                 .where((element) => element.getTitle() == mediaItem.title)
                 .first;
           });
-          _songController.updateItem(
+          await _songController.updateItem(
               id: _currentTrack.getId(),
               update: {'updatedAt': DateTime.now().toIso8601String()});
         }
