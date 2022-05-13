@@ -15,7 +15,10 @@ class VideoDownload {
     }
 
     if (await Permission.storage.status == PermissionStatus.denied) {
-      await Permission.storage.request();
+      var status = await Permission.storage.request();
+      if (status == PermissionStatus.denied) {
+        throw Exception('Storage permission is needed to download song.');
+      }
     }
     // Get video metadata.
     var video = await yt.videos.get(id);

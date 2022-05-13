@@ -276,27 +276,35 @@ class _AddNewSongState extends State<AddNewSong>
                                                       vertical: 8,
                                                       horizontal: 16),
                                               onPressed: () async {
-                                                VideoDownloadStream
-                                                    videoDownloadStream =
-                                                    await VideoDownload
-                                                        .getVideoDownloadStream(
-                                                            songs[index].path);
-                                                if (File(videoDownloadStream
-                                                        .path)
-                                                    .existsSync()) {
-                                                  File(videoDownloadStream.path)
-                                                      .deleteSync();
+                                                try {
+                                                  VideoDownloadStream
+                                                      videoDownloadStream =
+                                                      await VideoDownload
+                                                          .getVideoDownloadStream(
+                                                              songs[index]
+                                                                  .path);
+                                                  if (File(videoDownloadStream
+                                                          .path)
+                                                      .existsSync()) {
+                                                    File(videoDownloadStream
+                                                            .path)
+                                                        .deleteSync();
+                                                    Toast.showWarningToast(
+                                                        context,
+                                                        'Song is already downloaded');
+                                                    return;
+                                                  }
+                                                  videoDownloadStream
+                                                      .download();
+                                                  setState(() {
+                                                    videoDownloadStreams[
+                                                            currentIndex] =
+                                                        videoDownloadStream;
+                                                  });
+                                                } catch (e) {
                                                   Toast.showWarningToast(
-                                                      context,
-                                                      'Song is already downloaded');
-                                                  return;
+                                                      context, e.toString());
                                                 }
-                                                videoDownloadStream.download();
-                                                setState(() {
-                                                  videoDownloadStreams[
-                                                          currentIndex] =
-                                                      videoDownloadStream;
-                                                });
                                               },
                                               icon: const Icon(Icons.download)),
                                   // IconButton(

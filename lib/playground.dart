@@ -1,4 +1,6 @@
 // import 'dart:';
+// import 'package:flutter/foundation.dart';
+
 void main() {
   A a = A();
   // a.add(Future.delayed(const Duration(seconds: 2), () {
@@ -7,14 +9,23 @@ void main() {
   //     print(val);
   //   };
   // }));
-  var string =
-      '/var/mobile/Containers/Data/Application/FBBF1143-5B91-4DC3-987A-25F6668D0E26/Documents/files/Justin Bieber - Ghost.webm';
-  print(Uri.file(string));
+  // var string =
+  //     '/var/mobile/Containers/Data/Application/FBBF1143-5B91-4DC3-987A-25F6668D0E26/Documents/files/Justin Bieber - Ghost.webm';
+  // final List t = [];
+  // t.addAll([1, 4, 6]);
+  // print(t);
+  sdf();
+  // print(Uri.file(string));
   // String s = 'sdf sdf 6% 4421 sdf ;;';
   // print(s.splitMapJoin(RegExp(r'([^a-zA-Z\s].*)'), onMatch: (match) => ''));
 }
 
 sdf() {
+  pl();
+}
+
+pl() {
+  print(StackTrace.current);
   return '123';
 }
 
