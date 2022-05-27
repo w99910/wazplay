@@ -11,6 +11,9 @@ class PathProvider {
     } else if (Platform.isIOS) {
       externalStorageDirPath =
           (await getApplicationDocumentsDirectory()).absolute.path;
+    } else if (Platform.isMacOS) {
+      externalStorageDirPath =
+          (await getApplicationSupportDirectory()).absolute.path;
     }
 
     /// Use other directory to avoid deleting db file.

@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
@@ -11,6 +12,7 @@ import 'package:wazplay/index.dart';
 import 'package:wazplay/support/bindings/controllers_bindings.dart';
 import 'package:wazplay/support/eloquents/playlist.dart';
 import 'package:wazplay/support/eloquents/song.dart';
+import 'package:window_size/window_size.dart';
 
 Future<void> main() async {
   DB db = DB.instance;
@@ -30,6 +32,12 @@ Future<void> main() async {
     androidNotificationChannelName: 'Audio playback',
     androidNotificationOngoing: true,
   );
+  WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    setWindowTitle("WazPlay");
+    setWindowMinSize(const Size(400, 700));
+    setWindowMaxSize(const Size(400, 1000));
+  }
   var _pref = await SharedPreferences.getInstance();
   // await _pref.clear();
   ThemeMode mode = !_pref.containsKey('isDarkMode')

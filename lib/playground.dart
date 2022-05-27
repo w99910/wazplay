@@ -2,7 +2,10 @@
 // import 'package:flutter/foundation.dart';
 
 void main() {
-  A a = A();
+  B a = B();
+  print(
+      'WazEloquent is a flutter package in which you can interact with in-app “sqlite” database in the style of Laravel Eloquent.'
+          .length);
   // a.add(Future.delayed(const Duration(seconds: 2), () {
   //   return (val) {
   //     val += 1;
@@ -14,7 +17,7 @@ void main() {
   // final List t = [];
   // t.addAll([1, 4, 6]);
   // print(t);
-  sdf();
+  // sdf();
   // print(Uri.file(string));
   // String s = 'sdf sdf 6% 4421 sdf ;;';
   // print(s.splitMapJoin(RegExp(r'([^a-zA-Z\s].*)'), onMatch: (match) => ''));
@@ -41,5 +44,18 @@ class A {
       Function.apply(await function, [i]);
     }
     print(runtimeType);
+  }
+
+  test() {
+    print('test');
+  }
+}
+
+class B extends A with Test {}
+
+mixin Test on A {
+  @override
+  test() {
+    print('test 2');
   }
 }

@@ -126,7 +126,11 @@ class Song implements PreviewAble, Playable {
         duration: const Duration(seconds: 180),
         id: getId(),
         title: title,
-        artUri: thumbnail != null ? Uri.parse(thumbnail!) : null,
+        artUri: thumbnail != null
+            ? (reg.hasMatch(thumbnail!)
+                ? Uri.parse(thumbnail!)
+                : Uri.file(thumbnail!))
+            : null,
         extras: {
           "description": description,
           'url': path,

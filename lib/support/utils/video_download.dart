@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:wazplay/support/utils/path.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
@@ -14,12 +12,12 @@ class VideoDownload {
       throw Exception('Please check url is youtube link.');
     }
 
-    if (await Permission.storage.status == PermissionStatus.denied) {
-      var status = await Permission.storage.request();
-      if (status == PermissionStatus.denied) {
-        throw Exception('Storage permission is needed to download song.');
-      }
-    }
+    // if (await Permission.storage.status == PermissionStatus.denied) {
+    //   var status = await Permission.storage.request();
+    //   if (status == PermissionStatus.denied) {
+    //     throw Exception('Storage permission is needed to download song.');
+    //   }
+    // }
     // Get video metadata.
     var video = await yt.videos.get(id);
 
@@ -27,14 +25,14 @@ class VideoDownload {
     var manifest = await yt.videos.streamsClient.getManifest(id);
     // var audio = manifest.audioOnly.first;
     // var audioStream = yt.videos.streamsClient.get(audio);
-    // var streams = manifest.audio;
-    var streams = manifest.audio;
-    var audio = streams.withHighestBitrate();
+    var audio = manifest.audioOnly.first;
     var audioStream = yt.videos.streamsClient.get(audio);
 
     var dir = await PathProvider.getPath();
     // Compose the file name removing the unallowed characters in windows.
-    var fileName = '${video.title}.${audio.container.name}'
+
+    var fileName = '${video.title}.wav'
+        // '${video.title}.${audio.container.name}'
         .replaceAll(r'\', '')
         .replaceAll('/', '')
         .replaceAll('*', '')

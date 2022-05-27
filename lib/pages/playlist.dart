@@ -251,6 +251,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                       child: IconButton(
                           padding: const EdgeInsets.all(0),
                           onPressed: () async {
+                            if (songs.isEmpty) {
+                              return;
+                            }
                             await playlistController.updateItem(
                                 id: playlist.id.toString(),
                                 update: {
@@ -518,7 +521,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                                         );
                                       }
                                       WidgetsBinding.instance
-                                          ?.addPostFrameCallback((timeStamp) {
+                                          .addPostFrameCallback((timeStamp) {
                                         musicController.reload();
                                         Future.delayed(
                                             const Duration(milliseconds: 1500),

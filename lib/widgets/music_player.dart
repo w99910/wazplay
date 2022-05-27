@@ -224,36 +224,6 @@ class _MusicPlayerState extends State<MusicPlayer> {
                             : 'Song is already added in playlist';
                         Toast.showWarningToast(context, message);
                       }
-                      // bool confirm = false;
-                      // await showDialog(
-                      //     context: context,
-                      //     builder: (builder) {
-                      //       return CupertinoAlertDialog(
-                      //         title: const Text(
-                      //             'Are you sure to delete the song?'),
-                      //         actions: [
-                      //           TextButton(
-                      //               onPressed: () {
-                      //                 Navigator.pop(context);
-                      //                 confirm = true;
-                      //               },
-                      //               child: Text('Yes',
-                      //                   style:
-                      //                       TextStyle(color: Colors.red[400]))),
-                      //           TextButton(
-                      //               onPressed: () {
-                      //                 Navigator.pop(context);
-                      //               },
-                      //               child: Text('No',
-                      //                   style:
-                      //                       TextStyle(color: Colors.red[400]))),
-                      //         ],
-                      //       );
-                      //     });
-
-                      // if (confirm) {
-                      //   delete(_currentTrack);
-                      // }
                     });
                   },
                   child: const ListTile(
@@ -272,21 +242,27 @@ class _MusicPlayerState extends State<MusicPlayer> {
                               title: const Text(
                                   'Are you sure to delete the song?'),
                               actions: [
-                                TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      confirm = true;
-                                    },
-                                    child: Text('Yes',
-                                        style:
-                                            TextStyle(color: Colors.red[400]))),
-                                TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text('No',
-                                        style:
-                                            TextStyle(color: Colors.red[400]))),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        confirm = true;
+                                      },
+                                      child: Text('Yes',
+                                          style: TextStyle(
+                                              color: Colors.red[400]))),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text('No',
+                                          style: TextStyle(
+                                              color: Colors.red[400]))),
+                                ),
                               ],
                             );
                           });

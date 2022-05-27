@@ -54,25 +54,21 @@ class SongController {
     List<String> titles = [];
     var response = keyword != null
         ? await songEloquent.search(keyword, searchableColumns: ['title'])
-        : await songEloquent.select(['title']).get();
-
-    for (var res in response!) {
-      titles.add(res['title'].toString());
-    }
+        : await songEloquent.select(['title', 'author']).get();
 
     int count = 0;
-    for (var title in titles) {
-      List<String> split = title.toString().split('-');
+    for (var row in response!) {
+      List<String> split = row['title'].toString().split('-');
       String artist = Artist.extractArtistName(split[0]);
       if (artists.where((val) => val.name == artist).isEmpty) {
         String? thumbnail, bio;
-        try {
-          Map<String, dynamic>? details = await Artist.getDetails(artist);
-          if (details != null) {
-            thumbnail = details['strArtistThumb'];
-            bio = details['strBiographyEN'];
-          }
-        } catch (e) {}
+        Map<String, dynamic>? details = await Artist.getDetails(artist);
+        if (details != null) {
+          thumbnail = details['strArtistThumb'];
+          bio = details['strBiographyEN'];
+        } else {
+          artist = row['author'].toString();
+        }
         if (count < 5) {
           artists.add(Artist(name: artist, thumbnail: thumbnail, bio: bio));
         }

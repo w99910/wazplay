@@ -87,6 +87,7 @@ class _LibraryState extends State<Library> with AutomaticKeepAliveClientMixin {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             constraints: const BoxConstraints.expand(),
             child: SingleChildScrollView(
+              controller: ScrollController(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

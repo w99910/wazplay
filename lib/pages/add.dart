@@ -53,7 +53,7 @@ class _AddNewSongState extends State<AddNewSong>
   }
 
   save(int index) async {
-    WidgetsBinding.instance?.addPostFrameCallback((duration) async {
+    WidgetsBinding.instance.addPostFrameCallback((duration) async {
       if (App.instance.configuration.autoDownloadThumb) {
         var imageUrl = songs[index].thumbnail;
         if (imageUrl != null && songs[index].thumbnail!.isUrl()) {
@@ -176,6 +176,7 @@ class _AddNewSongState extends State<AddNewSong>
               child: totalCurrentSongs.isEmpty
                   ? const HowToSection()
                   : ListView.separated(
+                      controller: ScrollController(),
                       scrollDirection: Axis.vertical,
                       itemBuilder: (BuildContext context, int index) {
                         int currentIndex = totalCurrentSongs[index];
