@@ -66,15 +66,15 @@ android {
     // }
 
        signingConfigs {
-       release {
+            release {
         //    keyAlias keystoreProperties['keyAlias']
         //    keyPassword keystoreProperties['keyPassword']
         //    storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
         //    storePassword keystoreProperties['storePassword']
-            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null // Path relative to the app module dir
-            storePassword System.getenv("ANDROID_KEYSTORE_STORE_PASSWORD") ?: keyProperties['storePassword']
-            keyAlias System.getenv("ANDROID_KEYSTORE_PRIVATE_KEY_ALIAS") ?: keyProperties['keyAlias']
-            keyPassword System.getenv("ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD") ?: keyProperties['keyPassword']
+                storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
        }
    }
    buildTypes {
