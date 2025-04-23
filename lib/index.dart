@@ -48,8 +48,11 @@ class _IndexState extends State<Index> {
       setState(() {
         _currentIndex = index;
       });
-      _pageController.animateToPage(index,
-          duration: const Duration(milliseconds: 100), curve: Curves.easeOut);
+      _pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeOut,
+      );
     });
   }
 
@@ -62,48 +65,57 @@ class _IndexState extends State<Index> {
         builder: (context) {
           return CupertinoAlertDialog(
             title: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: RichText(
-                  text: TextSpan(
-                    style: TextStyle(height: 1.5),
-                    children: <TextSpan>[
-                      const TextSpan(
-                          text: 'Before using app, you must agree to this '),
-                      TextSpan(
-                          style: const TextStyle(
-                            color: Colors.blue,
-                          ),
-                          text: 'Terms And Conditions',
-                          recognizer: TapGestureRecognizer()
+              padding: const EdgeInsets.all(16.0),
+              child: RichText(
+                text: TextSpan(
+                  style: TextStyle(height: 1.5),
+                  children: <TextSpan>[
+                    const TextSpan(
+                      text: 'Before using app, you must agree to this ',
+                    ),
+                    TextSpan(
+                      style: const TextStyle(color: Colors.blue),
+                      text: 'Terms And Conditions',
+                      recognizer:
+                          TapGestureRecognizer()
                             ..onTap = () {
                               showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return const Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 20),
-                                      child: TermsAndConditions(),
-                                    );
-                                  });
-                            }),
-                    ],
-                  ),
-                )),
+                                isScrollControlled: true,
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 20,
+                                    ),
+                                    child: TermsAndConditions(),
+                                  );
+                                },
+                              );
+                            },
+                    ),
+                  ],
+                ),
+              ),
+            ),
             actions: [
               TextButton(
-                  onPressed: () {
-                    _pref.setBool('acceptedTermsAndConditions', true);
-                    Navigator.pop(context);
-                  },
-                  child: Text('Yes, I agree to those.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.green[400]))),
+                onPressed: () {
+                  _pref.setBool('acceptedTermsAndConditions', true);
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Yes, I agree to those.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.green[400]),
+                ),
+              ),
               TextButton(
-                  onPressed: () {
-                    exit(0);
-                  },
-                  child: Text('No', style: TextStyle(color: Colors.red[400]))),
+                onPressed: () {
+                  exit(0);
+                },
+                child: Text('No', style: TextStyle(color: Colors.red[400])),
+              ),
             ],
           );
         },
@@ -125,12 +137,12 @@ class _IndexState extends State<Index> {
               const LogoIcon(width: 45, height: 45),
               Text(
                 'WazPlay',
-                style: Theme.of(context).textTheme.headline3!.copyWith(
-                    fontFamily: 'PlayfairDisplay', fontWeight: FontWeight.w500),
+                style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                  fontFamily: 'PlayfairDisplay',
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-              const SizedBox(
-                width: 40,
-              )
+              const SizedBox(width: 40),
             ],
           ),
         ),
@@ -144,32 +156,44 @@ class _IndexState extends State<Index> {
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Obx(() => _musicController.isPlaying.value != -1
-              ? MusicPlayerPreview(
-                  playables: _musicController.songs, isConcatenated: true)
-              : const SizedBox()),
+          Obx(
+            () =>
+                _musicController.isPlaying.value != -1
+                    ? MusicPlayerPreview(
+                      playables: _musicController.songs,
+                      isConcatenated: true,
+                    )
+                    : const SizedBox(),
+          ),
           BottomNavigationBar(
-              currentIndex: _currentIndex,
-              onTap: (index) {
-                if (settings.vibrateable) {
-                  HapticFeedback.lightImpact();
-                }
-                if (index != _currentIndex) {
-                  setState(() {
-                    _currentIndex = index;
-                  });
-                  App.instance.routeController.currentTabIndex.value = index;
-                }
-              },
-              items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.library_music), label: 'Library'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.my_library_add), label: 'Add'),
-                BottomNavigationBarItem(
-                    icon: Icon(Icons.settings), label: 'Settings')
-              ]),
+            currentIndex: _currentIndex,
+            onTap: (index) {
+              if (settings.vibrateable) {
+                HapticFeedback.lightImpact();
+              }
+              if (index != _currentIndex) {
+                setState(() {
+                  _currentIndex = index;
+                });
+                App.instance.routeController.currentTabIndex.value = index;
+              }
+            },
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.library_music),
+                label: 'Library',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.my_library_add),
+                label: 'Add',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.settings),
+                label: 'Settings',
+              ),
+            ],
+          ),
         ],
       ),
     );

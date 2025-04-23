@@ -9,7 +9,7 @@ class PlaylistController {
   final PlaylistEloquent playlistEloquent = PlaylistEloquent();
 
   Future<Playlist?> create({required String description}) async {
-    int i = await playlistEloquent.create(values: {
+    int i = await playlistEloquent.create({
       'description': description,
       'createdAt': DateTime.now().toIso8601String(),
       'updatedAt': DateTime.now().toIso8601String(),
@@ -24,18 +24,24 @@ class PlaylistController {
     return Playlist.fromDB(data.first);
   }
 
-  Future<int?> deleteSongs(
-      {required List<Song> songs, required Playlist playlist}) async {
+  Future<int?> deleteSongs({
+    required List<Song> songs,
+    required Playlist playlist,
+  }) async {
     return await playlistEloquent.deleteSongs(songs: songs, playlist: playlist);
   }
 
-  Future updateItem(
-      {required String id, required Map<String, Object?> update}) async {
+  Future updateItem({
+    required String id,
+    required Map<String, Object?> update,
+  }) async {
     return playlistEloquent.where('id', id.toString()).update(update);
   }
 
-  Future<int?> updateSongs(
-      {required List<int> songs, required Playlist playlist}) async {
+  Future<int?> updateSongs({
+    required List<int> songs,
+    required Playlist playlist,
+  }) async {
     return await playlistEloquent.saveSongs(songs: songs, playlist: playlist);
   }
 
@@ -50,13 +56,14 @@ class PlaylistController {
     return songs;
   }
 
-  Future<List<Playlist>> all(
-      {int? limit,
-      String? orderBy,
-      String? groupBy,
-      bool? distinct,
-      bool descending = false,
-      int? offset}) async {
+  Future<List<Playlist>> all({
+    int? limit,
+    String? orderBy,
+    String? groupBy,
+    bool? distinct,
+    bool descending = false,
+    int? offset,
+  }) async {
     var el = await playlistEloquent
         .orderBy(orderBy, sort: descending ? Sort.descending : Sort.ascending)
         .skip(offset)
@@ -76,11 +83,16 @@ class PlaylistController {
     return playlists;
   }
 
-  Future<List<Playlist>> search(
-      {String? keyword, int? offset, int limit = 10}) async {
+  Future<List<Playlist>> search({
+    String? keyword,
+    int? offset,
+    int limit = 10,
+  }) async {
     if (keyword == null) return all(limit: limit, offset: offset);
-    var data = await playlistEloquent
-        .search(keyword, searchableColumns: ['description']);
+    var data = await playlistEloquent.search(
+      keyword,
+      searchableColumns: ['description'],
+    );
     return fromDB(data);
   }
 

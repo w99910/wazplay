@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/home/thomas/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/usr/bin/ninja",
+      "-C",
+      "/home/thomas/Projects/wazplay/android/app/.cxx/Debug/321n304q/x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/usr/bin/ninja",
+    "-C",
+    "/home/thomas/Projects/wazplay/android/app/.cxx/Debug/321n304q/x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

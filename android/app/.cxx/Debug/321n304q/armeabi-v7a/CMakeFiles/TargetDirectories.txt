@@ -1,0 +1,2 @@
+/home/thomas/Projects/wazplay/android/app/.cxx/Debug/321n304q/armeabi-v7a/CMakeFiles/edit_cache.dir
+/home/thomas/Projects/wazplay/android/app/.cxx/Debug/321n304q/armeabi-v7a/CMakeFiles/rebuild_cache.dir

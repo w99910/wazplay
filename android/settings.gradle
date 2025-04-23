@@ -1,11 +1,33 @@
+pluginManagement {
+    // Resolves Flutter plugins and Gradle tools.
+    def flutterSdkPath = {
+        def properties = new Properties()
+        file("local.properties").withInputStream { properties.load(it) }
+        def flutterSdkPath = properties.getProperty("flutter.sdk")
+        assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
+        return flutterSdkPath
+    }()
+
+    // Includes the Flutter tools' Gradle logic.
+    includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
+
+    // Specifies repositories for fetching plugins.
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+// Declares plugin versions used in the project.
+// You might need to adjust these versions based on your project's requirements
+// or Flutter doctor recommendations. Check your project-level build.gradle
+// (android/build.gradle) for existing versions if unsure.
+plugins {
+    id "dev.flutter.flutter-plugin-loader" version "1.0.0"
+    id "com.android.application" version "8.2.2" apply false // Example version, adjust if needed
+    id "org.jetbrains.kotlin.android" version "1.9.22" apply false // Example version, adjust if needed
+}
+
+// Includes your main application module.
 include ':app'
-
-def localPropertiesFile = new File(rootProject.projectDir, "local.properties")
-def properties = new Properties()
-
-assert localPropertiesFile.exists()
-localPropertiesFile.withReader("UTF-8") { reader -> properties.load(reader) }
-
-def flutterSdkPath = properties.getProperty("flutter.sdk")
-assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
-apply from: "$flutterSdkPath/packages/flutter_tools/gradle/app_plugin_loader.gradle"

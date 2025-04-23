@@ -25,7 +25,7 @@ Future<void> main() async {
       return (Database db) async {
         await db.execute('PRAGMA foreign_keys = ON');
       };
-    })
+    }),
   ]);
   await JustAudioBackground.init(
     androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
@@ -40,29 +40,29 @@ Future<void> main() async {
   }
   var _pref = await SharedPreferences.getInstance();
   // await _pref.clear();
-  ThemeMode mode = !_pref.containsKey('isDarkMode')
-      ? ThemeMode.system
-      : _pref.getBool('isDarkMode')!
+  ThemeMode mode =
+      !_pref.containsKey('isDarkMode')
+          ? ThemeMode.system
+          : _pref.getBool('isDarkMode')!
           ? ThemeMode.dark
           : ThemeMode.light;
-  runApp(MyApp(
-    themeMode: mode,
-  ));
+  runApp(MyApp(themeMode: mode));
 }
 
 class MyApp extends StatelessWidget {
   final ThemeMode themeMode;
+
   const MyApp({Key? key, required this.themeMode}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Flutter VideoDownload Demo',
+      title: 'WazPlay',
       theme: AppTheme.lightTheme,
-      initialBinding: ControllersBinding(),
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
       debugShowCheckedModeBanner: false,
+      initialBinding: ControllersBinding(),
       home: const Index(),
     );
   }

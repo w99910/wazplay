@@ -1,0 +1,73 @@
+name: Build Flutter Android Release APK
+
+# Controls when the workflow will run
+on:
+  push:
+    branches:
+      - main # Or 'master', or a specific branch like 'release'
+
+jobs:
+  build_android:
+    name: Build Flutter Android Release APK
+    # Use the latest Ubuntu runner
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout Repository Code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Setup Java Development Kit (JDK) - Required for Android builds
+      # Adjust version if needed based on your AGP requirements
+      - name: Setup Java (JDK)
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin" # Popular JDK distribution
+          java-version: "17" # Common version for recent AGP
+
+      # 3. Setup Flutter SDK
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable" # Use stable channel, or specify version
+          # flutter-version: '3.x.x' # Optional: Pin to a specific version
+
+      # 4. Get Flutter Dependencies
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      # 5. Decode Keystore from Secrets and place it where build.gradle expects
+      - name: Decode Keystore
+        # Use the Base64 secret and decode it back into a file
+        # Ensure the output path matches 'storeFile' in key.properties/build.gradle
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo $KEYSTORE_BASE64 | base64 --decode > android/app/upload-keystore.jks
+
+      # 6. Create key.properties file from Secrets
+      # This file is used by build.gradle to get signing credentials
+      - name: Create key.properties
+        env:
+          KEY_ALIAS: ${{ secrets.ANDROID_KEYSTORE_PRIVATE_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_STORE_PASSWORD }}
+        run: |
+          echo "storePassword=$STORE_PASSWORD" > android/key.properties
+          echo "keyPassword=$KEY_PASSWORD" >> android/key.properties
+          echo "keyAlias=$KEY_ALIAS" >> android/key.properties
+          # Ensure this path matches what build.gradle expects relative to the android dir
+          echo "storeFile=app/upload-keystore.jks" >> android/key.properties
+
+      # 7. Build the Android Release APK
+      - name: Build Release APK
+        run: flutter build apk --release
+
+      # 8. Upload the generated APK as an Artifact
+      # This makes the APK available for download from the Actions tab
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk-${{ github.sha }} # Naming the artifact uniquely
+          # Default path for the release APK:
+          path: build/app/outputs/flutter-apk/app-release.apk
