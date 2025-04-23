@@ -4,7 +4,7 @@
 
 WazPlay is just a music app written in flutter and service to download song and play it.
 
-WazPlay is the first product for **Waz** and so I decided to make it open-source. Watch and learn at your own risk. I really hope that you learn a lot from this app and make awesome apps by inspiring this. 👀✌️
+Use the app at your own risk. I really hope that you learn something from this app and make awesome apps by inspiring this. 👀✌️
 
 > Please do not sell or sub-licensing the app for any reason.
 
