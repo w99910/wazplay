@@ -76,12 +76,6 @@ android {
             keyAlias System.getenv("ANDROID_KEYSTORE_PRIVATE_KEY_ALIAS") ?: keyProperties['keyAlias']
             keyPassword System.getenv("ANDROID_KEYSTORE_PRIVATE_KEY_PASSWORD") ?: keyProperties['keyPassword']
        }
-
-        def keystoreProperties = new Properties()
-        def keystorePropertiesFile = rootProject.file('key.properties') // Path relative to the root android dir
-        if (keystorePropertiesFile.exists()) {
-            keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-        }
    }
    buildTypes {
        release {
