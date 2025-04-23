@@ -11,7 +11,7 @@ jobs:
     name: Build Flutter Android Release APK
     # Use the latest Ubuntu runner
     runs-on: ubuntu-latest
-
+    environment: release_build
     steps:
       # 1. Checkout Repository Code
       - name: Checkout code
