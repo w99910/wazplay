@@ -4,7 +4,7 @@ name: Build Flutter Android Release APK
 on:
   push:
     branches:
-      - main # Or 'master', or a specific branch like 'release'
+      - master # Or 'master', or a specific branch like 'release'
 
 jobs:
   build_android:
