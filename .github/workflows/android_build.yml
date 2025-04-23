@@ -4,7 +4,7 @@ name: Build Flutter Android Release APK
 on:
   push:
     branches:
-      - master # Or 'master', or a specific branch like 'release'
+      - release # Or 'master', or a specific branch like 'release'
 
 jobs:
   build_android:
@@ -57,7 +57,7 @@ jobs:
           echo "keyPassword=$KEY_PASSWORD" >> android/key.properties
           echo "keyAlias=$KEY_ALIAS" >> android/key.properties
           # Ensure this path matches what build.gradle expects relative to the android dir
-          echo "storeFile=app/upload-keystore.jks" >> android/key.properties
+          echo "storeFile=upload-keystore.jks" >> android/key.properties
 
       # 7. Build the Android Release APK
       - name: Build Release APK
