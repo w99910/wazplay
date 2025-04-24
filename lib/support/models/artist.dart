@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:http/http.dart' as http;
 import 'package:wazplay/support/interfaces/previewable.dart';
@@ -11,13 +12,28 @@ class Artist implements PreviewAble {
 
   static Future<Map<String, dynamic>?> getDetails(String authorName) async {
     var url = Uri.parse(
-        'https://www.theaudiodb.com/api/v1/json/2/search.php?s=$authorName');
+      'https://en.wikipedia.org/w/api.php?action=query&titles=$authorName&prop=extracts|pageimages&exintro=true&explaintext=true&pithumbsize=600&format=json&formatversion=2',
+    );
     var response = await http.get(url).timeout(const Duration(seconds: 10));
     Map<String, dynamic> data = await json.decode(response.body);
-    if (data['artists'] == null) {
+    // inspect(data);
+
+    if (data['query'] == null) {
       return null;
     }
-    Map<String, dynamic> d = data['artists'][0];
+
+    if (data['query']['pages'] is List && data['query']['pages'][0] == null) {
+      return null;
+    }
+
+    var page = data['query']['pages'][0];
+    Map<String, dynamic> d = {
+      "strBiographyEN": page["extract"],
+      "strArtistThumb":
+          page["thumbnail"] != null && page["thumbnail"] is Map
+              ? page["thumbnail"]["source"]
+              : null,
+    };
     return d;
   }
 
@@ -42,9 +58,10 @@ class Artist implements PreviewAble {
       artist = artist.split('-')[0];
     }
 
-    artist = artist
-        .splitMapJoin(RegExp(r'([^a-zA-Z\s].*)'), onMatch: (match) => '')
-        .trim();
+    artist =
+        artist
+            .splitMapJoin(RegExp(r'([^a-zA-Z\s].*)'), onMatch: (match) => '')
+            .trim();
     return artist;
   }
 

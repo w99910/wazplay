@@ -1,0 +1,2 @@
+/home/thomas/Projects/wazplay/android/app/.cxx/RelWithDebInfo/x526o2y5/armeabi-v7a/CMakeFiles/edit_cache.dir
+/home/thomas/Projects/wazplay/android/app/.cxx/RelWithDebInfo/x526o2y5/armeabi-v7a/CMakeFiles/rebuild_cache.dir

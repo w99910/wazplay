@@ -11,7 +11,9 @@
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
-    <application android:label="wazplay" android:name="${applicationName}" android:icon="@mipmap/launcher_icon">
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+
+    <application android:enableOnBackInvokedCallback="true" android:label="wazplay" android:name="${applicationName}" android:icon="@mipmap/launcher_icon">
         <meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@mipmap/launcher_icon" />
         <activity android:exported="true" android:launchMode="singleTop" android:theme="@style/LaunchTheme" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" android:hardwareAccelerated="true" android:name="com.ryanheise.audioservice.AudioServiceActivity" android:windowSoftInputMode="adjustResize">
             <!-- Specifies an Android theme to apply to this Activity as soon as
@@ -24,7 +26,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <service android:exported="true" android:name="com.ryanheise.audioservice.AudioService">
+        <service android:exported="true" android:name="com.ryanheise.audioservice.AudioService" android:foregroundServiceType="mediaPlayback">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>

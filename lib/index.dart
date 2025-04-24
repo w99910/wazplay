@@ -137,9 +137,9 @@ class _IndexState extends State<Index> {
               const LogoIcon(width: 45, height: 45),
               Text(
                 'WazPlay',
-                style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                style: Theme.of(context).textTheme.titleLarge!.copyWith(
                   fontFamily: 'PlayfairDisplay',
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(width: 40),

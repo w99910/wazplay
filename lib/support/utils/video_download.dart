@@ -48,9 +48,10 @@ class VideoDownload {
       file.deleteSync();
     }
     return VideoDownloadStream(
-        path: filePath,
-        audioStream: audioStream,
-        totalSize: audio.size.totalBytes);
+      path: filePath,
+      audioStream: audioStream,
+      totalSize: audio.size.totalBytes,
+    );
   }
 
   static Future<Map<String, String>> getDetail(String url) async {
@@ -81,8 +82,11 @@ class VideoDownloadStream {
 
   Stream<double> get stream => controller.stream;
 
-  VideoDownloadStream(
-      {required this.path, required this.audioStream, required this.totalSize});
+  VideoDownloadStream({
+    required this.path,
+    required this.audioStream,
+    required this.totalSize,
+  });
 
   Future download() async {
     var file = File(path);
@@ -94,22 +98,27 @@ class VideoDownloadStream {
     var output = file.openWrite(mode: FileMode.writeOnlyAppend);
     var size = totalSize;
     var count = 0;
-    audioStream.listen((data) {
-      count += data.length;
-      // Calculate the current progress.
-      output.add(data);
-      var progress = ((count / size) * 100).ceil();
-      controller.sink.add(progress / 100);
-    }, onDone: () async {
-      await controller.sink.close();
-      await controller.close();
+    audioStream.listen(
+      (data) {
+        count += data.length;
+        // Calculate the current progress.
+        output.add(data);
+        var progress = ((count / size) * 100).ceil();
+        controller.sink.add(progress / 100);
+      },
+      onDone: () async {
+        await controller.sink.close();
+        await controller.close();
 
-      output.close();
-    }, onError: (obj, trace) async {
-      controller.sink.addError(obj);
-      await controller.sink.close();
-      await controller.close();
-    }, cancelOnError: true);
+        output.close();
+      },
+      onError: (obj, trace) async {
+        controller.sink.addError(obj);
+        await controller.sink.close();
+        await controller.close();
+      },
+      cancelOnError: true,
+    );
   }
 }
 

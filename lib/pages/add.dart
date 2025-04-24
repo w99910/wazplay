@@ -56,6 +56,7 @@ class _AddNewSongState extends State<AddNewSong>
     WidgetsBinding.instance.addPostFrameCallback((duration) async {
       if (App.instance.configuration.autoDownloadThumb) {
         var imageUrl = songs[index].thumbnail;
+
         if (imageUrl != null && songs[index].thumbnail!.isUrl()) {
           var splits = songs[index].thumbnail!.split('/');
           String? imagePath = await Download.image(
