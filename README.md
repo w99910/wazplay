@@ -1,4 +1,6 @@
-# wazplay
+# Wazplay
+
+> Download the apk release version [here](https://github.com/w99910/wazplay/releases)
 
 ## Introduction
 
