@@ -58,7 +58,7 @@ Use the app at your own risk. I really hope that you learn something from this a
 
 **Please be aware that the code might not be production-ready.**
 
-If you thanks me, I am just grateful that I help you in some ways.
+If you thank me, I am just grateful that I help you in some ways.
 
 For more information, please contact [this email](hello@thomasbrillion.pro).
 
