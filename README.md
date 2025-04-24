@@ -56,13 +56,13 @@ Use the app at your own risk. I really hope that you learn something from this a
   >
 </p>
 
-**I haven't reformat the code yet. So you can do it yourself.**
+**Please be aware that the code might not be production-ready.**
 
 If you thanks me, I am just grateful that I help you in some ways.
 
-If you are interested in making flutter mobile apps or Laravel web apps, please contact [this email](hello.waz99@gmail.com).
+For more information, please contact [this email](hello@thomasbrillion.pro).
 
-Check out other packages offered by **Waz**
+Check out other flutter packages
 
 - [WazEloquent](https://github.com/w99910/wazeloquent)
 
